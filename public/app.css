@@ -1,0 +1,26 @@
+body {
+  background-color: teal;
+}
+
+.feed {
+  display: inline-block;
+  text-align: center;
+}
+
+article {
+  display: inline-block;
+  box-sizing: border-box;
+  background-color: #93D7A0;
+  padding: 0.5rem;
+  margin: 1rem;
+  height: 10rem;
+  width: 10rem;
+  vertical-align: top;
+  align-content: center;
+  text-align: center;
+}
+
+footer {
+  text-align: center;
+  font-size: 0.8rem;
+}

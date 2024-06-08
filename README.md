@@ -5,7 +5,7 @@ Users can log in, record their acts of kindness, and see a feed of kindness from
 
 TODO:
 
-- [ ] UI, draft
+- [x] UI, draft
 - [ ] User authentication (profile)
 - [ ] Kindness Log (private feed)
 - [ ] Categories and tags
