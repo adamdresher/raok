@@ -61,33 +61,33 @@
 ```sql
 | user                                             |
 | ------------------------------------------------ |
-| id          serial    PK                         |
-| name        varchar      NOT NULL        CHECK   |
-| email       varchar      NOT NULL UNIQUE CHECK   |
-| username    varchar      NOT NULL UNIQUE CHECK   |
-| created_on  timestamp    NOT NULL DEFAULT NOW    |
-| last_login  timestamp    NOT NULL DEFAULT NOW    |
+| id          serial     PK                        |
+| name        varchar       NOT NULL        CHECK  |
+| email       varchar       NOT NULL UNIQUE CHECK  |
+| username    varchar       NOT NULL UNIQUE CHECK  |
+| created_on  timestamp     NOT NULL DEFAULT NOW   |
+| last_login  timestamp     NOT NULL DEFAULT NOW   |
 | profile_pic varchar                              | (add later)
 
 | post                                             |
 | ------------------------------------------------ |
-| id          serial    PK                         |
-| user_id     integer   FK NOT NULL                |
-| created_on  timestamp    NOT NULL DEFAULT NOW()  |
-| public      boolean      NOT NULL DEFAULT TRUE   |
-| description varchar               DEFAULT ''     |
+| id          serial     PK                        |
+| user_id     integer    FK NOT NULL               |
+| created_on  timestamp     NOT NULL DEFAULT NOW() |
+| public      boolean       NOT NULL DEFAULT TRUE  |
+| description varchar                DEFAULT ''    |
 | photo       varchar                              | (add later)
 
 | hashtag_list                                     |
 | ------------------------------------------------ |
-| id          serial    PK                         |
-| title       varchar      NOT NULL                |
+| id          serial     PK                        |
+| title       varchar       NOT NULL               |
 
 | hashtag                                          |
 | ------------------------------------------------ |
-| id          serial    PK                         |
-| hashtag_id  integer   FK NOT NULL                |
-| post_id     integer   FK NOT NULL                |
+| id          serial     PK                        |
+| hashtag_id  integer    FK NOT NULL               |
+| post_id     integer    FK NOT NULL               |
 
 | like                                             |
 | ------------------------------------------------ |
