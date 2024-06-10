@@ -2,26 +2,28 @@
 ### Conceptual schema
 
 ```
-+-----------+                            +---------------+
-| user      |-||----------------------<o-| post          |
-+-----------+           1:M              +---------------+
-  |   |   |                                |   |   |   |
-  -   -   -                                -   -   -   o
-  -   -   -                                -   -   -   v
-  |   |   |                                |   |   |   |
-  |   |   |                                |   |   |   |
-  |   |   |          +----------+          |   |   |   |          +----------+
-  |   |   +-------<o-| like     |-o>-------+   |   |   +-------||-| category |
-  |   |      1:M     +----------+     M:1      |   |      M:1     +----------+
-  |   |                                        |   |
-  |   |              +----------+              |   |
-  |   +-----------<o-| favorite |-o>-----------+   |
-  |          1:M     +----------+     M:1          |
++------------+                          +----------------+      +--------------+
+| user       |-||--------------------<o-| post           |      | hashtag_list |
++------------+           1:M            +----------------+      +--------------+
+  |   |   |                                |   |   |   |              |
+  -   -   -                                -   -   -   -              -
+  -   -   -                                -   -   -   -              -
+  |   |   |                                |   |   |   |              |
+  |   |   |                                |   |   |   |              | 1:M
+  |   |   |          +----------+          |   |   |   |              |
+  |   |   +-------<o-| like     |-o>-------+   |   |   |              ^
+  |   |      1:M     +----------+     M:1      |   |   |              o
+  |   |                                        |   |   |              |
+  |   |              +----------+              |   |   |          +---------+
+  |   +-----------<o-| favorite |-o>-----------+   |   +-------<o-| hashtag |
+  |          1:M     +----------+     M:1          |      1:M     +---------+
   |                                                |
   |                  +----------+                  |
   +---------------<o-| comment  |-o>---------------+
              1:M     +----------+     M:1
 ```
+
+### Cadinality and Modality
 
 - A user can have zero or many posts
 - A post belongs to one user
@@ -48,8 +50,11 @@
 
 ---
 
-- A category can have zero or many posts
-- A post can belong one category
+- A hashtag_list can have zero or many hashtags
+- A hashtag belongs to one hashtah_list
+
+- A hashtag belongs to one post
+- A post can belong zero or many hashtags
 
 ### Physical schema
 
@@ -68,16 +73,21 @@
 | ------------------------------------------------ |
 | id          serial    PK                         |
 | user_id     integer   FK NOT NULL                |
-| category_id integer   FK NOT NULL DEFAULT ""     |
 | created_on  timestamp    NOT NULL DEFAULT NOW()  |
-| description varchar               DEFAULT ""     |
 | public      boolean      NOT NULL DEFAULT TRUE   |
+| description varchar               DEFAULT ''     |
 | photo       varchar                              | (add later)
 
-| category                                         |
+| hashtag_list                                     |
 | ------------------------------------------------ |
-| id          serial  PK                           |
-| title       varchar    NOT NULL                  |
+| id          serial    PK                         |
+| title       varchar      NOT NULL                |
+
+| hashtag                                          |
+| ------------------------------------------------ |
+| id          serial    PK                         |
+| hashtag_id  integer   FK NOT NULL                |
+| post_id     integer   FK NOT NULL                |
 
 | like                                             |
 | ------------------------------------------------ |
