@@ -99,7 +99,8 @@ ALTER SEQUENCE public.favorites_id_seq OWNED BY public.favorites.id;
 
 CREATE TABLE public.hashtag_list (
     id integer NOT NULL,
-    title character varying(50) NOT NULL
+    title character varying(50) NOT NULL,
+    CONSTRAINT hashtag_list_title_valid CHECK (((title)::text ~* '^(?!#).+'::text))
 );
 
 
@@ -245,7 +246,11 @@ CREATE TABLE public.users (
     email character varying(50) NOT NULL,
     username character varying(50) NOT NULL,
     created_on timestamp with time zone DEFAULT now() NOT NULL,
-    last_login timestamp with time zone DEFAULT now() NOT NULL
+    last_login timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT users_email_check CHECK (((email)::text <> ''::text)),
+    CONSTRAINT users_email_valid CHECK (((email)::text ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'::text)),
+    CONSTRAINT users_name_check CHECK (((name)::text <> ''::text)),
+    CONSTRAINT users_username_check CHECK (((username)::text <> ''::text))
 );
 
 
