@@ -7,7 +7,7 @@ TODO:
 
 - [x] UI, draft
 - [x] ERD
-- [ ] Db schema
+- [x] Db schema
 - [ ] User authentication (profile)
 - [ ] Kindness Log (private feed)
 - [ ] Categories
