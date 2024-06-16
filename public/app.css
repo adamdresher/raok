@@ -24,3 +24,18 @@ footer {
   text-align: center;
   font-size: 0.8rem;
 }
+
+.form-box {
+  display: inline-block;
+}
+
+.field {
+  display: block;
+  text-align: right;
+  font-family: sans-serif;
+  font-size: 1rem;
+}
+
+.field-button {
+  text-align: right;
+}

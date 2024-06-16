@@ -14,10 +14,28 @@
   <body>
     <header>
       <H1>Random Acts of Kindness</h1>
+
+      <% if session[:message] %>
+        <p><%= session.delete(:message) %></p>
+      <% end %>
+
+      <form action="/signup" method="get">
+        <button type="submit">Sign Up</button>
+      </form>
+
+      <form action="/signin" method="get">
+        <button type="submit">Sign In</button>
+      </form>
+
+      <form action="/signout" method="post">
+        <button type="submit">Sign Out</button>
+      </form>
     </header>
-    <div class="feed">
+
+    <div>
       <%== yield %>
     </div>
+
     <footer>
       <p>All rights reserved.</p>
     </footer>
