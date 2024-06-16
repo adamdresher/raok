@@ -5,13 +5,14 @@ Users can log in, record their acts of kindness, and see a feed of kindness from
 
 TODO:
 
-- [x] UI, draft
+- [x] Inspriation board, UI Spike (public feed)
 - [x] ERD
 - [x] Db schema
-- [ ] User authentication (profile)
-- [ ] Kindness Log (private feed)
+- [ ] User authentication, session-based (profile)
+- [ ] CRUD posts
 - [ ] Categories
-- [ ] Inspriation board (public feed)
+- [ ] Kindness Log (private feed)
+- [ ] Link session to db
 - [ ] Impact Tracker (analytics)
 - [ ] UI, finalize
 
