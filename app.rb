@@ -9,7 +9,11 @@ configure do
 end
 
 get '/' do
-  p session[:users]
+  session[:current_user] ||= {}
+
+  p "users are: #{session[:users]}"
+  p "current user is: #{session[:current_user]}"
+
   erb :index, layout: :layout
 end
 
@@ -18,25 +22,26 @@ get '/signup' do
 end
 
 post '/signup' do
+  session[:users] ||= {}
+
   username = params[:username].strip
   password1 = params[:password1]
   password2 = params[:password2]
 
-  session[:users] ||= {}
-  session[:users][username] = { name:      params[:name].strip,
-                                email:     params[:email].strip,
-                                username:  username,
-                                password1: password1,
-                                password2: password2 }
-
-
   if password1 != password2
-    session[:message] = 'invalid credentials'
-  else
-    session[:message] = 'account created'
-  end
+    session[:message] = 'Invalid credentials'
 
-  redirect '/'
+    redirect '/signup'
+  else
+    session[:message] = "Congrats #{params[:name]}, your account was created"
+    session[:users][username] = { name:      params[:name].strip,
+                                  email:     params[:email].strip,
+                                  username:  username,
+                                  password1: password1,
+                                  password2: password2 }
+
+    redirect '/'
+  end
 end
 
 get '/signin' do
@@ -55,7 +60,7 @@ post '/signin' do
   else
     session[:message] = "Invalid credentials"
 
-    erb :signin, layout: :layout
+    redirect '/signin'
   end
 end
 
@@ -63,8 +68,13 @@ post '/signout' do
   username = session[:current_user]
   session[:message] = "#{username} is signed out"
 
-  session[:current_user] = {}
+  session[:current_user] = ''
 
   redirect '/'
 end
 
+get '/profile' do
+  @username = session[:current_user]
+
+  erb :profile, layout: :layout
+end

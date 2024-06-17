@@ -13,23 +13,45 @@
 
   <body>
     <header>
-      <H1>Random Acts of Kindness</h1>
+      <div class="header">
+        <div>
+          <H1>Random Acts of Kindness</h1>
+        </div>
 
-      <% if session[:message] %>
-        <p><%= session.delete(:message) %></p>
-      <% end %>
+        <div class="auth_buttons">
+          <% if session[:current_user].empty? %>
 
-      <form action="/signup" method="get">
-        <button type="submit">Sign Up</button>
-      </form>
+            <div>
+              <form action="/signup" method="get">
+                <button type="submit">Sign Up</button>
+              </form>
+            </div>
 
-      <form action="/signin" method="get">
-        <button type="submit">Sign In</button>
-      </form>
+            <div>
+              <form action="/signin" method="get">
+                <button type="submit">Sign In</button>
+              </form>
+            </div>
 
-      <form action="/signout" method="post">
-        <button type="submit">Sign Out</button>
-      </form>
+          <% else %>
+
+            <div>
+              <p><%= session[:current_user] %>
+
+              <form action="/signout" method="post">
+                <button type="submit">Sign Out</button>
+              </form></p>
+            </div>
+
+          <% end %>
+        </div>
+      </div>
+
+      <div>
+        <% if session[:message] %>
+          <p><%= session.delete(:message) %></p>
+        <% end %>
+      </div>
     </header>
 
     <div>
