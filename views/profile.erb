@@ -2,7 +2,7 @@
   <h2><%== @username %></h2>
 
   <ul>
-    <% session[:users][@username].each do |attribute, value| %>
+    <% @profile.each do |attribute, value| %>
       <li>
         <p><b><%= attribute.capitalize %></b>: <%== value %></p>
       </li>

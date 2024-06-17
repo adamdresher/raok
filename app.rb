@@ -75,6 +75,9 @@ end
 
 get '/profile' do
   @username = session[:current_user]
+  @profile = session[:users][@username].reject do |attribute, _|
+    attribute.match? /password/
+  end
 
   erb :profile, layout: :layout
 end
