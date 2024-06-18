@@ -59,6 +59,16 @@ body {
   padding: 0px 20px;
 }
 
+.header img {
+  margin: 20px 20px 0px 0px;
+  height: 40px;
+  width: 40px;
+}
+
+.title {
+  display: flex;
+}
+
 .auth_buttons {
   display: flex;
   gap: 10px;
