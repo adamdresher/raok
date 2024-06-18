@@ -15,37 +15,34 @@
     <header>
       <div class="header">
         <div class="title">
-          <img src="raok-logo.png">
+          <a href="/"><img src="raok-logo.png"></a>
           <H1>Random Acts of Kindness</h1>
         </div>
 
+        <% if session[:current_user].empty? %>
+
         <div class="auth_buttons">
-          <% if session[:current_user].empty? %>
+          <div>
+            <form action="/signup" method="get">
+              <button type="submit">Sign Up</button>
+            </form>
+          </div>
 
-            <div>
-              <form action="/signup" method="get">
-                <button type="submit">Sign Up</button>
-              </form>
-            </div>
-
-            <div>
-              <form action="/signin" method="get">
-                <button type="submit">Sign In</button>
-              </form>
-            </div>
-
-          <% else %>
-
-            <div>
-              <p><%= session[:current_user] %>
-
-              <form action="/signout" method="post">
-                <button type="submit">Sign Out</button>
-              </form></p>
-            </div>
-
-          <% end %>
+          <div>
+            <form action="/signin" method="get">
+              <button type="submit">Sign In</button>
+            </form>
+          </div>
         </div>
+
+        <% else %>
+
+        <div class="profile_button">
+          <a href="/profile"><img src="user.png"></a>
+        </div>
+
+        <% end %>
+
       </div>
 
       <div>

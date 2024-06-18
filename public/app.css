@@ -59,14 +59,14 @@ body {
   padding: 0px 20px;
 }
 
-.header img {
+.title {
+  display: flex;
+}
+
+.title img {
   margin: 20px 20px 0px 0px;
   height: 40px;
   width: 40px;
-}
-
-.title {
-  display: flex;
 }
 
 .auth_buttons {
@@ -74,6 +74,12 @@ body {
   gap: 10px;
   padding: 20px;
   text-align: right;
+}
+
+.profile_button img {
+  margin: 20px 0px 0px 0px;
+  height: 40px;
+  width: 40px;
 }
 
 .feed {

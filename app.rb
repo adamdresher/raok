@@ -9,6 +9,7 @@ configure do
 end
 
 get '/' do
+  session[:users] ||= {}
   session[:current_user] ||= {}
 
   p "users are: #{session[:users]}"
@@ -22,8 +23,6 @@ get '/signup' do
 end
 
 post '/signup' do
-  session[:users] ||= {}
-
   username = params[:username].strip
   password1 = params[:password1]
   password2 = params[:password2]
@@ -35,8 +34,8 @@ post '/signup' do
   else
     session[:message] = "Congrats #{params[:name]}, your account was created"
     session[:users][username] = { name:      params[:name].strip,
-                                  email:     params[:email].strip,
                                   username:  username,
+                                  email:     params[:email].strip,
                                   password1: password1,
                                   password2: password2 }
 
@@ -52,7 +51,10 @@ post '/signin' do
   username = params[:username]
   password = params[:password]
 
-  if password == session[:users][username][:password1]
+  p "users are: #{session[:users]}"
+  p "current user is: #{session[:current_user]}"
+
+  if session[:users][username] && password == session[:users][username][:password1]
     session[:current_user] = username
     session[:message] = "#{username} is signed in!"
 
