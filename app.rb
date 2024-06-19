@@ -151,7 +151,8 @@ get '/user-kindnesses' do
     redirect '/'
   end
 
-  @posts = session[:posts]
+  username = session[:current_user]
+  @posts = session[:posts].select { |post| post[:user] == username }
 
   erb :user_kindnesses, layout: :layout
 end
