@@ -19,7 +19,13 @@
           <H1>Random Acts of Kindness</h1>
         </div>
 
-        <% if session[:current_user].empty? %>
+        <% if session[:current_user] %>
+
+        <div class="profile_button">
+          <a href="/profile"><img src="user.png"></a>
+        </div>
+
+        <% else %>
 
         <div class="auth_buttons">
           <div>
@@ -33,12 +39,6 @@
               <button type="submit">Sign In</button>
             </form>
           </div>
-        </div>
-
-        <% else %>
-
-        <div class="profile_button">
-          <a href="/profile"><img src="user.png"></a>
         </div>
 
         <% end %>

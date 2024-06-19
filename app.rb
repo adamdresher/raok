@@ -8,9 +8,22 @@ configure do
   set :erb, escape_html: true
 end
 
+# Route helper methods
+def logged_in?
+  session[:current_user]
+end
+
+def user_exists?(username)
+  session[:users][username]
+end
+
+def valid_credentials?(username, password)
+  password == session[:users][username][:password1]
+end
+
+# Routes
 get '/' do
   session[:users] ||= {}
-  session[:current_user] ||= {}
 
   p "users are: #{session[:users]}"
   p "current user is: #{session[:current_user]}"
@@ -19,6 +32,12 @@ get '/' do
 end
 
 get '/signup' do
+  if logged_in?
+    session[:message] = "Please sign out before creating a new account"
+
+    redirect '/'
+  end
+
   erb :signup, layout: :layout
 end
 
@@ -51,10 +70,7 @@ post '/signin' do
   username = params[:username]
   password = params[:password]
 
-  p "users are: #{session[:users]}"
-  p "current user is: #{session[:current_user]}"
-
-  if session[:users][username] && password == session[:users][username][:password1]
+  if user_exists?(username) && valid_credentials?(username, password)
     session[:current_user] = username
     session[:message] = "#{username} is signed in!"
 
@@ -70,12 +86,18 @@ post '/signout' do
   username = session[:current_user]
   session[:message] = "#{username} is signed out"
 
-  session[:current_user] = ''
+  session.delete(:current_user)
 
   redirect '/'
 end
 
 get '/profile' do
+  unless logged_in?
+    session[:message] = "Please sign in first"
+
+    redirect '/'
+  end
+
   @username = session[:current_user]
   @profile = session[:users][@username].reject do |attribute, _|
     attribute.match? /password/
