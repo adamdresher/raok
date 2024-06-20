@@ -8,10 +8,15 @@ TODO:
 - [x] Inspriation board, UI Spike (public feed)
 - [x] ERD
 - [x] Db schema
-- [ ] User authentication, session-based (profile)
+- [x] User authentication
+  - [x] Session-based (profile)
+  - [ ] Support update and delete accounts
+- [ ] Encrypt passwords
 - [ ] CRUD posts
-- [ ] Categories
-- [ ] Kindness Log (private feed)
+  - [x] create, read posts
+  - [ ] update, delete posts
+- [ ] Hashtags
+- [x] Kindness Log (private feed)
 - [ ] Link session to db
 - [ ] Impact Tracker (analytics)
 - [ ] UI, finalize
