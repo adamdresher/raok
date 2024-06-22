@@ -81,9 +81,9 @@ post '/signup' do
   else
     session[:message] = "Congrats #{params[:name]}, your account was created"
     password = BCrypt::Password.create(password1)
-    session[:users][username] = { name:      params[:name].strip,
-                                  username:  username,
-                                  email:     params[:email].strip,
+    session[:users][username] = { name:     params[:name].strip,
+                                  username: username,
+                                  email:    params[:email].strip,
                                   password: password }
 
     redirect '/'
