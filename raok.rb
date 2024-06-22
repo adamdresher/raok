@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'sinatra/reloader'
 require 'tilt/erubis'
+require 'bcrypt'
 
 configure do
   enable :sessions
@@ -31,7 +32,17 @@ def user_exists?(username)
 end
 
 def valid_credentials?(username, password)
-  password == session[:users][username][:password1]
+  return false unless session[:users] && session[:users][username]
+
+  p "user entered: #{password}\n\n"
+
+  encrypted_password = session[:users][username][:password]
+  p "actual password: #{encrypted_password}"
+
+  decrypted_password = BCrypt::Password.new(encrypted_password)
+  p "decrypted it is: #{decrypted_password}"
+
+  decrypted_password == password
 end
 
 # Routes
@@ -69,11 +80,11 @@ post '/signup' do
     redirect '/signup'
   else
     session[:message] = "Congrats #{params[:name]}, your account was created"
+    password = BCrypt::Password.create(password1)
     session[:users][username] = { name:      params[:name].strip,
                                   username:  username,
                                   email:     params[:email].strip,
-                                  password1: password1,
-                                  password2: password2 }
+                                  password: password }
 
     redirect '/'
   end
