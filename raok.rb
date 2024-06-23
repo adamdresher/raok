@@ -2,11 +2,24 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'tilt/erubis'
 require 'bcrypt'
+require 'pg'
+require 'pry'
+require 'pry-byebug'
+
+require_relative 'database-persistence'
 
 configure do
   enable :sessions
   set :session_secrets, 'super secret'
   set :erb, escape_html: true
+end
+
+before do
+  @storage = DatabasePersistence.new(logger)
+end
+
+after do
+  @storage.disconnect
 end
 
 # Route helper methods
@@ -27,20 +40,16 @@ end
 #   redirect '/'
 # end
 
-def user_exists?(username)
-  session[:users][username]
-end
+# def user_exists?(username)
+#   # session[:users][username]
+#   @storage.user_exists?(username)
+# end
 
 def valid_credentials?(username, password)
-  return false unless session[:users] && session[:users][username]
+  return false unless @storage.user_exists?(username)
 
-  p "user entered: #{password}\n\n"
-
-  encrypted_password = session[:users][username][:password]
-  p "actual password: #{encrypted_password}"
-
+  encrypted_password = @storage.encrypted_password_for(username)
   decrypted_password = BCrypt::Password.new(encrypted_password)
-  p "decrypted it is: #{decrypted_password}"
 
   decrypted_password == password
 end
@@ -70,7 +79,6 @@ get '/signup' do
 end
 
 post '/signup' do
-  username = params[:username].strip
   password1 = params[:password1]
   password2 = params[:password2]
 
@@ -80,11 +88,14 @@ post '/signup' do
     redirect '/signup'
   else
     session[:message] = "Congrats #{params[:name]}, your account was created"
+
+    name = params[:name].strip
+    email = params[:email].strip
+    username = params[:username]
     password = BCrypt::Password.create(password1)
-    session[:users][username] = { name:     params[:name].strip,
-                                  username: username,
-                                  email:    params[:email].strip,
-                                  password: password }
+
+    user_data = [name, email, username, password]
+    @storage.add_user!(user_data)
 
     redirect '/'
   end
@@ -98,7 +109,7 @@ post '/signin' do
   username = params[:username]
   password = params[:password]
 
-  if user_exists?(username) && valid_credentials?(username, password)
+  if @storage.user_exists?(username) && valid_credentials?(username, password)
     session[:current_user] = username
     session[:message] = "#{username} is signed in!"
 
@@ -127,9 +138,7 @@ get '/profile' do
   end
 
   @username = session[:current_user]
-  @profile = session[:users][@username].reject do |attribute, _|
-    attribute.match? /password/
-  end
+  @profile = @storage.user_profile(@username)
 
   erb :profile, layout: :layout
 end
