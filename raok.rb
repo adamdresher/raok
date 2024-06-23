@@ -40,11 +40,6 @@ end
 #   redirect '/'
 # end
 
-# def user_exists?(username)
-#   # session[:users][username]
-#   @storage.user_exists?(username)
-# end
-
 def valid_credentials?(username, password)
   return false unless @storage.user_exists?(username)
 
@@ -54,16 +49,20 @@ def valid_credentials?(username, password)
   decrypted_password == password
 end
 
+def user_profile(params)
+  name = params[:name].strip
+  email = params[:email].strip
+  username = params[:username]
+  password = BCrypt::Password.create(params[:password1])
+
+  [name, email, username, password]
+end
+
 # Routes
 get '/' do
   session[:users] ||= {}
   session[:posts] ||= []
   @posts = session[:posts]
-
-  p "users are: #{session[:users]}"
-  p "current user is: #{session[:current_user]}"
-  p "posts are: #{@posts}"
-
 
   erb :index, layout: :layout
 end
@@ -89,12 +88,7 @@ post '/signup' do
   else
     session[:message] = "Congrats #{params[:name]}, your account was created"
 
-    name = params[:name].strip
-    email = params[:email].strip
-    username = params[:username]
-    password = BCrypt::Password.create(password1)
-
-    user_data = [name, email, username, password]
+    user_data = user_profile(params)
     @storage.add_user!(user_data)
 
     redirect '/'
@@ -109,7 +103,7 @@ post '/signin' do
   username = params[:username]
   password = params[:password]
 
-  if @storage.user_exists?(username) && valid_credentials?(username, password)
+  if valid_credentials?(username, password)
     session[:current_user] = username
     session[:message] = "#{username} is signed in!"
 
@@ -157,9 +151,6 @@ post '/new-kindness' do
   user = session[:current_user]
   post = { user: user, description: params[:description] }
   session[:posts] << post
-
-  p user
-  p post
 
   redirect '/user-kindnesses'
 end
