@@ -23,22 +23,25 @@ after do
 end
 
 # Route helper methods
-def logged_in?
+def signed_in?
   session[:current_user]
 end
 
-# can't help thinking about refactoring,
-# but holding off until I cover all/most functionality
-#
-# def return_home_unless(logged_in) # use logged_in? or !logged_in?
-#   if logged_in
-#     session[:message] = "Please sign out before creating a new account"
-#   else
-#     session[:message] = "Please sign in first"
-#   end
-#
-#   redirect '/'
-# end
+def return_home_if_signed_in
+  if signed_in?
+    session[:message] = "Please sign out first"
+
+    redirect '/'
+  end
+end
+
+def return_home_unless_signed_in
+  if !signed_in?
+    session[:message] = "Please sign in first"
+
+    redirect '/'
+  end
+end
 
 def valid_credentials?(username, password)
   return false unless @storage.user_exists?(username)
@@ -68,11 +71,7 @@ get '/' do
 end
 
 get '/signup' do
-  if logged_in?
-    session[:message] = "Please sign out before creating a new account"
-
-    redirect '/'
-  end
+  return_home_if_signed_in
 
   erb :signup, layout: :layout
 end
@@ -96,6 +95,8 @@ post '/signup' do
 end
 
 get '/signin' do
+  return_home_if_signed_in
+
   erb :signin, layout: :layout
 end
 
@@ -125,11 +126,7 @@ post '/signout' do
 end
 
 get '/profile' do
-  unless logged_in?
-    session[:message] = "Please sign in first"
-
-    redirect '/'
-  end
+  return_home_unless_signed_in
 
   @username = session[:current_user]
   @profile = @storage.user_profile(@username)
@@ -138,11 +135,7 @@ get '/profile' do
 end
 
 get '/new-kindness' do
-  unless logged_in?
-    session[:message] = "Please sign in first"
-
-    redirect '/'
-  end
+  return_home_unless_signed_in
 
   erb :new_kindness, layout: :layout
 end
@@ -156,11 +149,7 @@ post '/new-kindness' do
 end
 
 get '/user-kindnesses' do
-  unless logged_in?
-    session[:message] = "Please sign in first"
-
-    redirect '/'
-  end
+  return_home_unless_signed_in
 
   username = session[:current_user]
   @posts = session[:posts].select { |post| post[:user] == username }
