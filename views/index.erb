@@ -7,7 +7,7 @@
 
   <% @posts.reverse_each do |post| %>
     <article>
-      <p><%== post[:description] %></p>
+      <p><%== post['description'] %></p>
     </article>
   <% end %>
 

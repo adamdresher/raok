@@ -63,9 +63,10 @@ end
 
 # Routes
 get '/' do
-  session[:users] ||= {}
-  session[:posts] ||= []
-  @posts = session[:posts]
+  # session[:users] ||= {}
+  # session[:posts] ||= []
+  # @posts = session[:posts]
+  @posts = @storage.all_posts
 
   erb :index, layout: :layout
 end

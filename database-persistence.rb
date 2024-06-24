@@ -46,11 +46,11 @@ class DatabasePersistence
     user_id = query(sql, username).values.flatten.first
 
     sql = "INSERT INTO posts (user_id, description) VALUES ($1, $2);"
+
     query(sql, user_id, description)
   end
 
   def posts(username)
-
     sql = <<~QUERY
       SELECT description FROM posts
         JOIN users
@@ -58,7 +58,13 @@ class DatabasePersistence
        WHERE username = $1;
     QUERY
 
-    result = query(sql, username)
+    query(sql, username)
+  end
+
+  def all_posts
+    sql = "SELECT description FROM posts;"
+
+    query(sql)
   end
 end
 
