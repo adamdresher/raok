@@ -7,6 +7,8 @@ require 'pry'
 require 'pry-byebug'
 
 require_relative 'database-persistence'
+require_relative 'storage'
+require_relative 'user'
 
 configure do
   enable :sessions
