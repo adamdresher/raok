@@ -40,5 +40,25 @@ class DatabasePersistence
 
     result.first
   end
+
+  def add_post!(username, description)
+    sql = "SELECT id FROM users WHERE username = $1"
+    user_id = query(sql, username).values.flatten.first
+
+    sql = "INSERT INTO posts (user_id, description) VALUES ($1, $2);"
+    query(sql, user_id, description)
+  end
+
+  def posts(username)
+
+    sql = <<~QUERY
+      SELECT description FROM posts
+        JOIN users
+          ON users.id = posts.user_id
+       WHERE username = $1;
+    QUERY
+
+    result = query(sql, username)
+  end
 end
 

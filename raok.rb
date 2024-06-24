@@ -141,9 +141,10 @@ get '/new-kindness' do
 end
 
 post '/new-kindness' do
-  user = session[:current_user]
-  post = { user: user, description: params[:description] }
-  session[:posts] << post
+  username = session[:current_user]
+  description = params[:description]
+
+  @storage.add_post!(username, description)
 
   redirect '/user-kindnesses'
 end
@@ -152,7 +153,7 @@ get '/user-kindnesses' do
   return_home_unless_signed_in
 
   username = session[:current_user]
-  @posts = session[:posts].select { |post| post[:user] == username }
+  @posts = @storage.posts(username)
 
   erb :user_kindnesses, layout: :layout
 end
