@@ -132,7 +132,6 @@ get '/profile' do
   return_home_unless_signed_in
 
   @username = session[:current_user]
-  # @profile = @storage.user_profile(@username)
   @profile = @user.profile(@username)
 
   erb :profile, layout: :layout
@@ -148,7 +147,6 @@ post '/new-kindness' do
   username = session[:current_user]
   description = params[:description]
 
-  # @storage.add_post!(username, description)
   @user.add_post!(username, description)
 
   redirect '/user-kindnesses'
@@ -158,7 +156,6 @@ get '/user-kindnesses' do
   return_home_unless_signed_in
 
   username = session[:current_user]
-  # @posts = @storage.posts(username)
   @posts = @user.posts(username)
 
   erb :user_kindnesses, layout: :layout
