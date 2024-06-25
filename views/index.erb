@@ -8,7 +8,13 @@
 
   <% @posts.reverse_each do |post| %>
     <article class="post">
-      <p><%== post['description'] %></p>
+      <div class="post content">
+        <p><%== post['description'] %></p>
+      </div>
+      <div class="post metadata">
+        <p>Adam likes this kindness</p>
+        <p>Beautiful!</p>
+      </div>
     </article>
   <% end %>
 

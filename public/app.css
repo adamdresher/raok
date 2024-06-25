@@ -99,13 +99,34 @@ article.post {
   display: inline-block;
   box-sizing: border-box;
   background-color: #93DEBE;
-  padding: 0.5rem;
   margin: 1rem;
-  height: 10rem;
+  height: 14rem;
   width: 10rem;
   vertical-align: top;
   align-content: center;
   text-align: center;
+}
+
+article.post .content {
+  background-color: #A8E4CB;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  height: 10rem;
+  width: 10rem;
+  align-content: center;
+
+}
+
+article.post .metadata {
+  background-color: #84C7AB;
+  box-sizing: border-box;
+  display: grid;
+  align-content: space-between;
+  padding: 0rem 0.5rem;
+  height: 4rem;
+  width: 10rem;
+  font-size: 0.7rem;
+  text-align: left;
 }
 
 article.post.new_post {
