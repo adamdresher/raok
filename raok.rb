@@ -89,7 +89,6 @@ post '/signup' do
   else
     session[:message] = "Congrats #{params[:name]}, your account was created"
 
-    # user_data = user_profile(params)
     user_data = @user.profile(params)
     @storage.add_user!(user_data)
 
