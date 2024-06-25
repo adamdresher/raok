@@ -1,12 +1,13 @@
 <div class="feed">
-  <a href="/new-kindness">
-    <article>
+  <article class="post new_post">
+    <a href="/new-kindness">
       <p><b>+</b></p>
-    </article>
-  </a>
+      <span></span>
+    </a>
+  </article>
 
   <% @posts.reverse_each do |post| %>
-    <article>
+    <article class="post">
       <p><%== post['description'] %></p>
     </article>
   <% end %>

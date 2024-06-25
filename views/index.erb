@@ -1,32 +1,33 @@
 <div class="feed">
-  <a href="/new-kindness">
-    <article>
+  <article class="post new_post">
+    <a href="/new-kindness">
       <p><b>+</b></p>
-    </article>
-  </a>
+      <span></span>
+    </a>
+  </article>
 
   <% @posts.reverse_each do |post| %>
-    <article>
+    <article class="post">
       <p><%== post['description'] %></p>
     </article>
   <% end %>
 
-  <article>
+  <article class="post">
     <p>I left some art made of flowers on a park bench.</p>
   </article>
-  <article>
+  <article class="post">
     <p>Someone saw me walking my motorbike and offered to push me to the nearby mechanic.</p>
   </article>
-  <article>
+  <article class="post">
     <p>A restaurant let me bring my dog inside.</p>
   </article>
-  <article>
+  <article class="post">
     <p>I bought a drink for the next person in line.</p>
   </article>
-  <article>
+  <article class="post">
     <p>I cleaned up the trash from others before leaving a local park.</p>
   </article>
-  <article>
+  <article class="post">
     <p>A friend came over to build flutes from bamboo in my yard, then surprised me and others by giving us the flutes he made.</p>
   </article>
 </div>
