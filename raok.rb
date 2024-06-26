@@ -81,9 +81,23 @@ def merge_likes(posts) # posts is a PG::Result object which has access to Enumer
   merged_posts
 end
 
+helpers do
+  def format_likes_from(users)
+    count = users.size
+
+    case count
+    when 1   then "Liked by #{users.first}"
+    when 2   then "Liked by #{users.first} and #{users.last}"
+    when 3   then "Liked by #{users.first}, #{users[1]}, and one other"
+    when 4.. then "Liked by #{users.first}, #{users[1]} and #{count - 2} others"
+    end
+  end
+end
+
 # Routes
 get '/' do
   @posts = @storage.all_posts
+  @posts = merge_likes(@storage.all_posts)
 
   erb :index, layout: :layout
 end

@@ -6,14 +6,14 @@
     </a>
   </article>
 
-  <% @posts.reverse_each do |post| %>
+  <% @posts.each_pair do |_, post| %>
     <article class="post">
       <div class="post content">
-        <p><%== post['description'] %></p>
+        <p><%== post[:description] %></p>
       </div>
       <div class="post metadata">
-        <p>Adam likes this kindness</p>
-        <p>Beautiful!</p>
+        <p><%== format_likes_from(post[:liked_by]) %></p>
+        <p>-- Comments go here --</p>
       </div>
     </article>
   <% end %>

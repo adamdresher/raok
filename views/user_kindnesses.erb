@@ -13,7 +13,7 @@
         <p><%== post[:description] %></p>
       </div>
       <div class="post metadata">
-        <p>Liked by <%== post[:liked_by].join(', ') %></p>
+        <p><%== format_likes_from(post[:liked_by]) %></p>
         <p>-- Comments go here --</p>
       </div>
     </article>

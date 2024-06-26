@@ -34,7 +34,16 @@ class Storage
   end
 
   def all_posts
-    sql = "SELECT description FROM posts;"
+    sql = <<~QUERY
+         SELECT p_user.username AS posted_by, p.description, p.id, u.username AS liked_by
+           FROM posts AS p
+      FULL JOIN likes AS l
+             ON p.id = l.post_id
+           JOIN users AS u
+             ON u.id = l.user_id
+           JOIN users AS p_user
+             ON p_user.id = p.user_id;
+    QUERY
 
     @db.query(sql)
   end
