@@ -29,10 +29,15 @@ class User
 
   def posts(username)
     sql = <<~QUERY
-      SELECT description FROM posts
-        JOIN users
-          ON users.id = posts.user_id
-       WHERE username = $1;
+         SELECT p_user.username AS posted_by, p.description, p.id, u.username AS liked_by
+           FROM posts AS p
+      FULL JOIN likes AS l
+             ON p.id = l.post_id
+           JOIN users AS u
+             ON u.id = l.user_id
+           JOIN users AS p_user
+             ON p_user.id = p.user_id
+           WHERE p_user.username = $1;
     QUERY
 
     @db.query(sql, username)

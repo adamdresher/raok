@@ -65,6 +65,22 @@ def user_profile(params)
   [name, email, username, password]
 end
 
+def merge_likes(posts) # posts is a PG::Result object which has access to Enumerable methods
+  merged_posts = {}
+
+  posts.each do |post|
+    id = post['id'].to_i
+
+    if merged_posts[id]
+      merged_posts[id][:liked_by] << post['liked_by']
+    else
+      merged_posts[id] = { description: post['description'], liked_by: [post['liked_by']] }
+    end
+  end
+
+  merged_posts
+end
+
 # Routes
 get '/' do
   @posts = @storage.all_posts
@@ -155,7 +171,7 @@ get '/user-kindnesses' do
   return_home_unless_signed_in
 
   username = session[:current_user]
-  @posts = @user.posts(username)
+  @posts = merge_likes(@user.posts(username))
 
   erb :user_kindnesses, layout: :layout
 end

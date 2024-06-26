@@ -7,14 +7,14 @@
     </a>
   </article>
 
-  <% @posts.reverse_each do |post| %>
+  <% @posts.each_pair do |id, post| %>
     <article class="post">
       <div class="post content">
-        <p><%== post['description'] %></p>
+        <p><%== post[:description] %></p>
       </div>
       <div class="post metadata">
-        <p>Adam likes this kindness</p>
-        <p>Beautiful!</p>
+        <p>Liked by <%== post[:liked_by].join(', ') %></p>
+        <p>-- Comments go here --</p>
       </div>
     </article>
   <% end %>
