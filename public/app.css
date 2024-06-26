@@ -131,6 +131,15 @@ article.post .metadata {
 
 article.post.new_post {
   position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  background-color: #93DEBE;
+  margin: 1rem;
+  height: 10rem;
+  width: 10rem;
+  vertical-align: top;
+  align-content: center;
+  text-align: center;
 }
 
 .new_post span {
