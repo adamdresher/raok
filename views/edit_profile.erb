@@ -1,0 +1,26 @@
+<p><b>Edit Your Profile:</b><//p>
+
+<div class="form-box">
+  <form action="/edit_profile" method="post">
+    <% @profile.each do |attribute, value| %>
+
+    <div class="form-box field">
+      <label for="edit-profile"><%== attribute.capitalize %>:
+        <input type="text" name="<%== attribute %>" id="<%== attribute %>" value="<%== value %>">
+      </label>
+    </div>
+
+    <% end %>
+
+    <div class="field-button">
+      <button type="submit">Submit</button>
+    </div>
+  </form>
+
+  <div class="field-button">
+    <form action="/profile" method="get">
+      <button type="submit">Cancel</button>
+    </form>
+  </div>
+</div>
+

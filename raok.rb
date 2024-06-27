@@ -162,8 +162,21 @@ get '/profile' do
 
   @username = session[:current_user]
   @profile = @user.profile(@username)
+  @posts = merge_likes(@user.posts(@username))
 
   erb :profile, layout: :layout
+end
+
+get '/edit_profile' do
+  return_home_unless_signed_in
+
+  @username = session[:current_user]
+  @profile = @user.profile(@username)
+
+  erb :edit_profile, layout: :layout
+end
+
+post '/edit_profile' do
 end
 
 get '/new-kindness' do
@@ -179,14 +192,5 @@ post '/new-kindness' do
   @user.add_post!(username, description)
 
   redirect '/user-kindnesses'
-end
-
-get '/user-kindnesses' do
-  return_home_unless_signed_in
-
-  username = session[:current_user]
-  @posts = merge_likes(@user.posts(username))
-
-  erb :user_kindnesses, layout: :layout
 end
 

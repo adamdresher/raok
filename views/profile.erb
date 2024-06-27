@@ -1,21 +1,33 @@
 <div>
   <h2><%== @username %></h2>
-
-  <ul>
-    <% @profile.each do |attribute, value| %>
-      <li>
-        <p><b><%= attribute.capitalize %></b>: <%== value %></p>
-      </li>
-    <% end %>
-  </ul>
-
   <div>
-    <a href="/user-kindnesses">My Kindnesses</a>
-  </div>
+    <form action="/edit_profile" method="get">
+      <button type="submit">Edit Profile</button>
+    </form>
 
-  <div>
     <form action="/signout" method="post">
       <button type="submit">Sign Out</button>
-    </form></p>
+    </form>
   </div>
+</div>
+
+<div class="feed">
+  <article class="post new_post">
+    <a href="/new-kindness">
+      <p><b>+</b></p>
+      <span></span>
+    </a>
+  </article>
+
+  <% @posts.each_pair do |_, post| %>
+    <article class="post">
+      <div class="post content">
+        <p><%== post[:description] %></p>
+      </div>
+      <div class="post metadata">
+        <p><%== format_likes_from(post[:liked_by]) %></p>
+        <p>-- Comments go here --</p>
+      </div>
+    </article>
+  <% end %>
 </div>
