@@ -1,7 +1,7 @@
 <div class="feed">
   <article class="post new_post">
+    <p><b>+</b></p>
     <a href="/new-kindness">
-      <p><b>+</b></p>
       <span></span>
     </a>
   </article>
@@ -23,11 +23,13 @@
         </p>
 
         <p>
-            <img src="/icons/comments.png" alt="no likes yet" width="12" height="12"> <%== v['comment'] ? v['comment'].count : '' %>
+          <img src="/icons/comments.png" alt="no likes yet" width="12" height="12"> <%== v['comment'] ? v['comment'].count : '' %>
         </p>
-
-        <p> format_likes_from(v['liked_by']</p>
       </div>
+
+      <a href="/kindness/<%== k %>">
+        <span></span>
+      </a>
     </article>
 
   <% end %>
