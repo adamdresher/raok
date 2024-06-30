@@ -6,15 +6,30 @@
     </a>
   </article>
 
-  <% @posts.each_pair do |_, post| %>
+  <% @posts.each_pair do |k, v| %>
+
     <article class="post">
       <div class="post content">
-        <p><%== post[:description] %></p>
+        <p><%== v['description'] %></p>
       </div>
+
       <div class="post metadata">
-        <p><%== format_likes_from(post[:liked_by]) %></p>
-        <p>-- Comments go here --</p>
+        <p>
+          <% if v['liked_by'] %>
+            <img src="/icons/like-on.png" alt="has likes" width="12" height="12"> <%== v['liked_by'].count %>
+          <% else %>
+            <img src="/icons/like-off.png" alt="no likes yet" width="12" height="12">
+          <% end %>
+        </p>
+
+        <p>
+            <img src="/icons/comments.png" alt="no likes yet" width="12" height="12"> <%== v['comment'] ? v['comment'].count : '' %>
+        </p>
+
+        <p> format_likes_from(v['liked_by']</p>
       </div>
     </article>
+
   <% end %>
+
 </div>

@@ -121,12 +121,15 @@ article.post .metadata {
   background-color: #84C7AB;
   box-sizing: border-box;
   display: grid;
-  align-content: space-between;
   padding: 0rem 0.5rem;
   height: 4rem;
   width: 10rem;
   font-size: 0.7rem;
   text-align: left;
+}
+
+article.post .metadata p {
+  margin-bottom: 0rem;
 }
 
 article.post.new_post {

@@ -29,15 +29,26 @@ class User
 
   def posts(username)
     sql = <<~QUERY
-         SELECT p_user.username AS posted_by, p.description, p.id, u.username AS liked_by
-           FROM posts AS p
-      FULL JOIN likes AS l
-             ON p.id = l.post_id
-           JOIN users AS u
-             ON u.id = l.user_id
-           JOIN users AS p_user
-             ON p_user.id = p.user_id
-           WHERE p_user.username = $1;
+        SELECT p.id AS post_id,
+               u.username AS posted_by,
+               substring(p.description FOR 24) AS description,
+               l_user.username AS liked_by,
+               c.id AS comment_id,
+               c_user.username AS commented_by,
+               c.description AS comment
+          FROM posts AS p
+          JOIN users AS u
+            ON u.id = p.user_id
+     LEFT JOIN likes AS l
+            ON p.id = l.post_id
+     LEFT JOIN users AS l_user
+            ON l.user_id = l_user.id
+     LEFT JOIN comments AS c
+            ON p.id = c.post_id
+     LEFT JOIN users AS c_user
+            ON c.user_id = c_user.id
+         WHERE u.username = $1
+      ORDER BY p.id;
     QUERY
 
     @db.query(sql, username)
