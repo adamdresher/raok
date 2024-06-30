@@ -84,22 +84,26 @@ def merge_metadata(posts) # posts is a PG::Result object which has access to Enu
       end
     end
 
-    # adds extra comments/likes
     lists.each do |list|
-      if (merged_posts[id][list].class == Array) && !merged_posts[id][list].include?(post[list])
-        if list == 'commented_id'
-          merged_posts[id]['comment_id'] << comment
-        elsif list == 'liked_by'
-          merged_posts[id]['liked_by'] << post[list]
-        end
-      end
+      if post[list]
 
-      # adds first comment/like
-      unless merged_posts[id][list]
-        if list == 'comment'
-          merged_posts[id][list] = { post['comment_id'] => comment }
-        elsif list == 'liked_by'
-          merged_posts[id][list] = [post[list]]
+        # adds extra comments/likes
+        if (merged_posts[id][list].class == Array) && !merged_posts[id][list].include?(post[list])
+
+          if list == 'commented_id'
+            merged_posts[id]['comment_id'] << comment
+          elsif list == 'liked_by'
+            merged_posts[id]['liked_by'] << post[list]
+          end
+        end
+
+        # adds first comment/like
+        unless merged_posts[id][list]
+          if list == 'comment'
+            merged_posts[id][list] = { post['comment_id'] => comment }
+          elsif list == 'liked_by'
+            merged_posts[id][list] = [post[list]]
+          end
         end
       end
     end
