@@ -31,7 +31,7 @@ class User
     sql = <<~QUERY
         SELECT p.id AS post_id,
                u.username AS posted_by,
-               substring(p.description FOR 24) AS description,
+               p.description AS description,
                l_user.username AS liked_by,
                c.id AS comment_id,
                c_user.username AS commented_by,
