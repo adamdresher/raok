@@ -110,9 +110,10 @@ end
 
 helpers do
   def format_likes_from(users)
-    count = users.size
+    count = users.class == Array ? users.size : 0
 
     case count
+    when 0   then 'Be the first to like!'
     when 1   then "Liked by #{users.first}"
     when 2   then "Liked by #{users.first} and #{users.last}"
     when 3   then "Liked by #{users.first}, #{users[1]}, and one other"
@@ -223,4 +224,12 @@ post '/new-kindness' do
   @user.add_post!(username, description)
 
   redirect '/user-kindnesses'
+end
+
+get '/kindness/:kindness_id' do
+  id = params[:kindness_id].to_i
+
+  @kindness = merge_metadata(@storage.post(id))[id]
+
+  erb :kindness, layout: :layout
 end

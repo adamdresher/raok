@@ -58,5 +58,31 @@ class Storage
 
     @db.query(sql)
   end
+
+  def post(id)
+    sql = <<~QUERY
+        SELECT p.id AS post_id,
+               u.username AS posted_by,
+               p.description AS description,
+               l_user.username AS liked_by,
+               c.id AS comment_id,
+               c_user.username AS commented_by,
+               c.description AS comment
+          FROM posts AS p
+          JOIN users AS u
+            ON u.id = p.user_id
+     LEFT JOIN likes AS l
+            ON p.id = l.post_id
+     LEFT JOIN users AS l_user
+            ON l.user_id = l_user.id
+     LEFT JOIN comments AS c
+            ON p.id = c.post_id
+     LEFT JOIN users AS c_user
+            ON c.user_id = c_user.id
+         WHERE p.id = $1;
+    QUERY
+
+    result = @db.query(sql, id)
+  end
 end
 
