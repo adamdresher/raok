@@ -96,6 +96,7 @@ body {
 }
 
 article.post {
+  position: relative;
   display: inline-block;
   box-sizing: border-box;
   background-color: #93DEBE;
@@ -145,7 +146,7 @@ article.post.new_post {
   text-align: center;
 }
 
-.new_post span {
+.post span {
   position: absolute;
   width: 100%;
   height: 100%;
