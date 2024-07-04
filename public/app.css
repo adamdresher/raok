@@ -99,10 +99,9 @@ article.post {
   position: relative;
   display: inline-block;
   box-sizing: border-box;
-  background-color: #93DEBE;
   margin: 1rem;
   width: 10rem;
-  vertical-align: top;
+  vertical-align: center;
   align-content: center;
   text-align: center;
 }
@@ -114,7 +113,6 @@ article.post .content {
   height: 10rem;
   width: 10rem;
   align-content: center;
-
 }
 
 article.post .metadata {
@@ -139,6 +137,52 @@ article.post span {
   height: 100%;
   left: 0;
   top: 0;
+}
+
+div #current-post {
+  display: flex;
+  justify-content: center;
+}
+
+div #current-content {
+  align-content: center;
+}
+
+article.post.current {
+  margin: 3rem;
+  width: 60%;
+  padding-bottom: 100%;
+}
+
+article.post .content.current {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/*
+ * ensuring the text doesn't overflow the container
+article.post .content.current p {
+  margin: 0;
+  text-align: center;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+*/
+
+article.post .metadata.current {
+  position: relative;
+  width: 100%;
+  justify-content: start;
+}
+
+article.post .metadata.current p {
+  margin-bottom: 0rem;
+  display:flex;
+  justify-content: start;
 }
 
 article.post.new_post {

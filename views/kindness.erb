@@ -1,6 +1,22 @@
+<div id="current-post">
+  <article class="post current">
+    <div class="post content current">
+      <p><%== @kindness['description'] %></p>
+    </div>
 
-<p>Kindness by <%== @kindness['posted_by'] %></p>
-<p><%== @kindness['description'] %></p>
-<p><%== format_likes_from(@kindness['liked_by']) %></p>
-<p>-- comments go here --</p>
-
+    <div class="post metadata current">
+      <p>Kindness by <%== @kindness['posted_by'] %></p>
+      <p>
+        <% if @kindness['liked_by'] %>
+          <img src="/icons/like-on.png" alt="has likes" width="12" height="12">
+        <% else %>
+          <img src="/icons/like-off.png" alt="no likes yet" width="12" height="12">
+        <% end %>
+        <%== format_likes_from(@kindness['liked_by']) %>
+      </p>
+      <p>
+        <img src="/icons/comments.png" alt="no likes yet" width="12" height="12"> <%== @kindness['comment'] ? @kindness['comment'].count : 0 %>
+      </p>
+    </div>
+  </article>
+</div>
