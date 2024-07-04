@@ -117,7 +117,7 @@ helpers do
     count = users.class == Array ? users.size : 0
 
     case count
-    when 0   then 'Be the first to like!'
+    when 0   then 'No likes yet, be the first!'
     when 1   then "Liked by #{users.first}"
     when 2   then "Liked by #{users.first} and #{users.last}"
     when 3   then "Liked by #{users.first}, #{users[1]}, and one other"
