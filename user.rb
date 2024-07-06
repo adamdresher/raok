@@ -1,17 +1,52 @@
 class User
-  def initialize(db:)
+  def initialize(user_id, db)
     @db = db
+    @profile = self.class.profile(user_id, db)
+
+    @id = @profile['id']
+    @username = @profile['username'] # test this
+    @name = @profile['name']
+    @email = @profile['email']
   end
 
-  def profile(username) # doesnt display password
+  attr_reader :profile, :id, :username, :name, :email
+
+  def self.id(username, db)
     sql = <<~QUERY
-      SELECT name, email, username FROM users
+      SELECT id, name, email, username FROM users
        WHERE username = $1;
     QUERY
 
-    result = @db.query(sql, username)
+    result = db.query(username, sql)
+
+    result.first['id']
+  end
+
+  def self.profile(user_id, db)
+    sql = <<~QUERY
+      SELECT id, name, email, username FROM users
+       WHERE id = $1;
+    QUERY
+
+    result = db.query(user_id, sql)
 
     result.first
+  end
+
+  def update_profile!(old_name, old_email, new_name, new_email)
+    sql = <<~QUERY
+      UPDATE users
+         SET name = $1,
+             email = $2
+       WHERE name = $3 AND email = $4;
+    QUERY
+
+    @db.query(new_name, new_email, old_name, old_email, sql)
+    user_id = @profile['id']
+    @profile = self.class.profile(user_id, @db)
+  end
+
+  def delete!
   end
 
   def add_post!(username, description)
@@ -20,14 +55,12 @@ class User
        WHERE username = $1
     QUERY
 
-    user_id = @db.query(sql, username).values.flatten.first
-
     sql = "INSERT INTO posts (user_id, description) VALUES ($1, $2);"
 
-    @db.query(sql, user_id, description)
+    @db.query(@user.id, description, sql)
   end
 
-  def posts(username)
+  def posts
     sql = <<~QUERY
         SELECT p.id AS post_id,
                u.username AS posted_by,
@@ -51,7 +84,7 @@ class User
       ORDER BY p.id;
     QUERY
 
-    @db.query(sql, username)
+    @db.query(self.username, sql)
   end
 end
 

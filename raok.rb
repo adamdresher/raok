@@ -12,14 +12,15 @@ require_relative 'user'
 
 configure do
   enable :sessions
-  set :session_secrets, 'super secret'
+  set :session_secret, 'WTu3&CEJn@vG@9AdxLAV833R!rYTZ^2tiejq4kWh8UEsRmDZXa&nyvdWz$#&S#wT'
   set :erb, escape_html: true
 end
 
 before do
+  user_id = session[:current_user]
   @db = DatabasePersistence.new(logger)
-  @storage = Storage.new(db: @db)
-  @user = User.new(db: @db)
+  @storage = Storage.new(@db)
+  @user = User.new(user_id, @db) if signed_in?
 end
 
 after do
@@ -75,6 +76,7 @@ def merge_metadata(posts) # posts is a PG::Result object which has access to Enu
     comment = { 'comment' => post['comment'],
                 'commented_by' => post['commented_by'] }
 
+    # creates post
     # adds post wo comments/likes
     unless merged_posts[id]
       merged_posts[id] = {}
@@ -87,6 +89,7 @@ def merge_metadata(posts) # posts is a PG::Result object which has access to Enu
     lists.each do |list|
       if post[list]
 
+        # updates post
         # adds extra comments/likes
         if (merged_posts[id][list].class == Array) && !merged_posts[id][list].include?(post[list])
 
@@ -97,6 +100,7 @@ def merge_metadata(posts) # posts is a PG::Result object which has access to Enu
           end
         end
 
+        # updates post
         # adds first comment/like
         unless merged_posts[id][list]
           if list == 'comment'
@@ -126,14 +130,13 @@ helpers do
   end
 
   def post_has_likes?(posts, id)
-    
   end
 end
 
 # Routes
 get '/' do
   @posts = @storage.all_posts
-  @posts = merge_metadata(@storage.all_posts)
+  @posts = merge_metadata(@storage.all_posts) # @storage.all_posts should already merge them
 
   erb :index, layout: :layout
 end
@@ -173,7 +176,10 @@ post '/signin' do
   password = params[:password]
 
   if valid_credentials?(username, password)
-    session[:current_user] = username
+    user_id = User.id(username, @db)
+    @user = User.new(user_id, @db)
+
+    session[:current_user] = user_id
     session[:message] = "#{username} is signed in!"
 
     redirect '/'
@@ -185,7 +191,7 @@ post '/signin' do
 end
 
 post '/signout' do
-  username = session[:current_user]
+  username = @user.username
   session[:message] = "#{username} is signed out"
 
   session.delete(:current_user)
@@ -196,9 +202,9 @@ end
 get '/profile' do
   return_home_unless_signed_in
 
-  @username = session[:current_user]
-  @profile = @user.profile(@username)
-  @posts = merge_metadata(@user.posts(@username))
+  @username = @user.username
+  @profile = @user.profile
+  @posts = merge_metadata(@user.posts)
 
   erb :profile, layout: :layout
 end
@@ -206,13 +212,31 @@ end
 get '/edit_profile' do
   return_home_unless_signed_in
 
-  @username = session[:current_user]
-  @profile = @user.profile(@username)
+  @username = @user.username
+  @profile = @user.profile
+  @profile.reject! { |k, v| ['id', 'username'].include? k }
 
   erb :edit_profile, layout: :layout
 end
 
 post '/edit_profile' do
+  old_name = @user.profile['name']
+  old_email = @user.profile['email']
+  new_name = params[:name]
+  new_email = params[:email]
+
+  @user.update_profile!(old_name, old_email, new_name, new_email)
+
+  redirect '/profile'
+end
+
+post '/delete_user' do
+  username = @user.username # test this
+  @storage.delete_user!(username)
+
+  session.delete(:current_user)
+
+  redirect '/'
 end
 
 get '/new-kindness' do
@@ -222,7 +246,7 @@ get '/new-kindness' do
 end
 
 post '/new-kindness' do
-  username = session[:current_user]
+  username = @user.username
   description = params[:description]
 
   @user.add_post!(username, description)
@@ -233,7 +257,7 @@ end
 get '/kindness/:kindness_id' do
   id = params[:kindness_id].to_i
 
-  @kindness = merge_metadata(@storage.post(id))[id]
+  @kindness = merge_metadata(@storage.post(id))[id] # @storage.post(id) should handle this
 
   erb :kindness, layout: :layout
 end
