@@ -22,13 +22,13 @@ class Storage
     @db.query(*user_data, sql)
   end
 
-  def delete_user!(db, username)
+  def delete_user!(username)
     sql = <<~QUERY
       DELETE FROM users
        WHERE username = $1
     QUERY
 
-  @db.query(*user_data, sql)
+    @db.query(username, sql)
   end
 
   def encrypted_password_for(username)
