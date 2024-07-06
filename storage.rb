@@ -1,16 +1,6 @@
 class Storage
-  def initialize(db:)
+  def initialize(db)
     @db = db
-  end
-
-  def add_user!(user_data)
-    sql = <<~QUERY
-      INSERT INTO users
-             (name, email, username, password)
-      VALUES ($1, $2, $3, $4)
-    QUERY
-
-    @db.query(sql, *user_data)
   end
 
   def user_exists?(username)
@@ -22,13 +12,32 @@ class Storage
     users.include?(username)
   end
 
+  def add_user!(user_data)
+    sql = <<~QUERY
+      INSERT INTO users
+             (name, email, username, password)
+      VALUES ($1, $2, $3, $4)
+    QUERY
+
+    @db.query(*user_data, sql)
+  end
+
+  def delete_user!(db, username)
+    sql = <<~QUERY
+      DELETE FROM users
+       WHERE username = $1
+    QUERY
+
+  @db.query(*user_data, sql)
+  end
+
   def encrypted_password_for(username)
     sql = <<~QUERY
       SELECT password FROM users
        WHERE username = $1;
     QUERY
 
-    result = @db.query(sql, username)
+    result = @db.query(username, sql)
 
     result.values.flatten.first
   end
@@ -82,7 +91,7 @@ class Storage
          WHERE p.id = $1;
     QUERY
 
-    result = @db.query(sql, id)
+    result = @db.query(id, sql)
   end
 end
 
