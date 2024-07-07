@@ -66,56 +66,6 @@ def user_profile(params)
   [name, email, username, password]
 end
 
-def merge_metadata(posts) # posts is a PG::Result object which has access to Enumerable methods
-  merged_posts = {}
-  lists = ['liked_by', 'comment']
-  strings = ['post_id', 'posted_by', 'description']
-
-  posts.each do |post|
-    id = post['post_id'].to_i
-    comment = { 'comment' => post['comment'],
-                'commented_by' => post['commented_by'] }
-
-    # creates post
-    # adds post wo comments/likes
-    unless merged_posts[id]
-      merged_posts[id] = {}
-
-      strings.each do |string|
-        merged_posts[id][string] = post[string]
-      end
-    end
-
-    lists.each do |list|
-      if post[list]
-
-        # updates post
-        # adds extra comments/likes
-        if (merged_posts[id][list].class == Array) && !merged_posts[id][list].include?(post[list])
-
-          if list == 'commented_id'
-            merged_posts[id]['comment_id'] << comment
-          elsif list == 'liked_by'
-            merged_posts[id]['liked_by'] << post[list]
-          end
-        end
-
-        # updates post
-        # adds first comment/like
-        unless merged_posts[id][list]
-          if list == 'comment'
-            merged_posts[id][list] = { post['comment_id'] => comment }
-          elsif list == 'liked_by'
-            merged_posts[id][list] = [post[list]]
-          end
-        end
-      end
-    end
-  end
-
-  merged_posts
-end
-
 helpers do
   def format_likes_from(users)
     count = users.class == Array ? users.size : 0
@@ -136,7 +86,6 @@ end
 # Routes
 get '/' do
   @posts = @storage.all_posts
-  @posts = merge_metadata(@storage.all_posts) # @storage.all_posts should already merge them
 
   erb :index, layout: :layout
 end
@@ -231,7 +180,7 @@ post '/edit_profile' do
 end
 
 post '/delete_user' do
-  username = @user.username # test this
+  username = @user.username
   @storage.delete_user!(username)
 
   session.delete(:current_user)
@@ -257,7 +206,7 @@ end
 get '/kindness/:kindness_id' do
   id = params[:kindness_id].to_i
 
-  @kindness = merge_metadata(@storage.post(id))[id] # @storage.post(id) should handle this
+  @kindness = @storage.post(id)
 
   erb :kindness, layout: :layout
 end
