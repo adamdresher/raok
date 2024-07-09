@@ -1,7 +1,7 @@
 <div class="feed">
   <article class="post new_post">
     <p><b>+</b></p>
-    <a href="/new-kindness">
+    <a href="/new_kindness">
       <span></span>
     </a>
   </article>
@@ -19,11 +19,11 @@
         </p>
         <p>
           <% if v['liked_by'] %>
-            <img src="/icons/like-on.png" alt="has likes" width="12" height="12"> <%== v['liked_by'] ? v['liked_by'].count : 0 %>
+            <img src="/icons/like-on.png" width="12" height="12"> <%== v['liked_by'] ? v['liked_by'].count : 0 %>
           <% else %>
-            <img src="/icons/like-off.png" alt="no likes yet" width="12" height="12"> <%== v['liked_by'] ? v['liked_by'].count : 0 %>
+            <img src="/icons/like-off.png" width="12" height="12"> <%== v['liked_by'] ? v['liked_by'].count : 0 %>
           <% end %>
-          <img src="/icons/comments.png" alt="no likes yet" width="12" height="12"> <%== v['comment'] ? v['comment'].count : 0 %>
+          <img src="/icons/comments.png" width="12" height="12"> <%== v['comment'] ? v['comment'].count : 0 %>
         </p>
       </div>
 

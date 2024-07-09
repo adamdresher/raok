@@ -153,7 +153,8 @@ get '/profile' do
 
   @username = @user.username
   @profile = @user.profile
-  @posts = merge_metadata(@user.posts)
+  # @posts = merge_metadata(@user.posts)
+  @posts = @user.posts
 
   erb :profile, layout: :layout
 end
@@ -188,13 +189,13 @@ post '/delete_user' do
   redirect '/'
 end
 
-get '/new-kindness' do
+get '/new_kindness' do
   return_home_unless_signed_in
 
   erb :new_kindness, layout: :layout
 end
 
-post '/new-kindness' do
+post '/new_kindness' do
   username = @user.username
   description = params[:description]
 
@@ -210,3 +211,4 @@ get '/kindness/:kindness_id' do
 
   erb :kindness, layout: :layout
 end
+
