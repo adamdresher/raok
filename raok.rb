@@ -140,8 +140,9 @@ post '/signin' do
 end
 
 post '/signout' do
-  username = @user.username
-  session[:message] = "#{username} is signed out"
+  session[:message] = "#{@user.username} is signed out"
+
+  @user = nil
 
   session.delete(:current_user)
 
@@ -169,6 +170,7 @@ get '/user/edit' do
 end
 
 post '/user/edit' do
+  session[:message] = "#{@user.username}'s profile has been updated"
   old_name = @user.profile['name']
   old_email = @user.profile['email']
   new_name = params[:name]
@@ -180,8 +182,10 @@ post '/user/edit' do
 end
 
 post '/user/delete' do
-  username = @user.username
-  @storage.delete_user!(username)
+  session[:message] = "#{@user.username} has been deleted"
+
+  @user.delete!
+  @user = nil
 
   session.delete(:current_user)
 
@@ -195,6 +199,7 @@ get '/kindness/new' do
 end
 
 post '/kindness/new' do
+  session[:message] = "Your post has been created"
   username = @user.username
   description = params[:description]
 
@@ -212,6 +217,12 @@ get '/kindness/:kindness_id' do
 end
 
 post '/kindness/:kindness_id/delete' do
+  session[:message] = "Your post has been deleted"
+  id = params[:kindness_id].to_i
+
+  @user.delete_post!(id)
+
+  redirect '/user'
 end
 
 post '/kindness/:kindness_id/like' do
