@@ -8,7 +8,7 @@ class User
     @profile = self.class.profile(user_id, db)
 
     @id = @profile['id']
-    @username = @profile['username'] # test this
+    @username = @profile['username']
     @name = @profile['name']
     @email = @profile['email']
   end
@@ -51,17 +51,32 @@ class User
   end
 
   def delete!
+    user_id = @user.id
+    sql = <<~QUERY
+      DELETE FROM users
+       WHERE id = $1;
+    QUERY
+
+    @db.query(user_id, sql)
   end
 
   def add_post!(username, description)
     sql = <<~QUERY
-      SELECT id FROM users
-       WHERE username = $1
+      INSERT INTO posts
+             (user_id, description)
+      VALUES ($1, $2);
     QUERY
 
-    sql = "INSERT INTO posts (user_id, description) VALUES ($1, $2);"
-
     @db.query(@user.id, description, sql)
+  end
+
+  def delete_post!(post_id)
+    sql = <<~QUERY
+      DELETE FROM posts
+       WHERE id = $1;
+    QUERY
+
+    @db.query(post_id, sql)
   end
 
   def posts
