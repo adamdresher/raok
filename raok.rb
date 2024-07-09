@@ -148,7 +148,7 @@ post '/signout' do
   redirect '/'
 end
 
-get '/profile' do
+get '/user' do
   return_home_unless_signed_in
 
   @username = @user.username
@@ -158,7 +158,7 @@ get '/profile' do
   erb :profile, layout: :layout
 end
 
-get '/edit_profile' do
+get '/user/edit' do
   return_home_unless_signed_in
 
   @username = @user.username
@@ -168,7 +168,7 @@ get '/edit_profile' do
   erb :edit_profile, layout: :layout
 end
 
-post '/edit_profile' do
+post '/user/edit' do
   old_name = @user.profile['name']
   old_email = @user.profile['email']
   new_name = params[:name]
@@ -176,10 +176,10 @@ post '/edit_profile' do
 
   @user.update_profile!(old_name, old_email, new_name, new_email)
 
-  redirect '/profile'
+  redirect '/user'
 end
 
-post '/delete_user' do
+post '/user/delete' do
   username = @user.username
   @storage.delete_user!(username)
 
@@ -188,13 +188,13 @@ post '/delete_user' do
   redirect '/'
 end
 
-get '/new_kindness' do
+get '/kindness/new' do
   return_home_unless_signed_in
 
   erb :new_kindness, layout: :layout
 end
 
-post '/new_kindness' do
+post '/kindness/new' do
   username = @user.username
   description = params[:description]
 
@@ -211,3 +211,11 @@ get '/kindness/:kindness_id' do
   erb :kindness, layout: :layout
 end
 
+post '/kindness/:kindness_id/delete' do
+end
+
+post '/kindness/:kindness_id/like' do
+end
+
+post '/kindness/:kindness_id/comment' do
+end

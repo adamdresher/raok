@@ -7,7 +7,7 @@
     <b><%== @username %></b>
   </p>
 
-  <form action="/edit_profile" method="post">
+  <form action="/user/edit" method="post">
     <% @profile.each do |attribute, value| %>
 
     <div class="form-box field">
@@ -24,7 +24,7 @@
   </form>
 
   <div class="field-button">
-    <form action="/profile" method="get">
+    <form action="/user" method="get">
       <button type="submit">Cancel</button>
     </form>
   </div>
@@ -32,7 +32,7 @@
 
 <div class="form-box">
   <div class="field-button">
-    <form action="/delete_user" method="post">
+    <form action="/user/delete" method="post">
       <button type="submit">Delete Account</button>
     </form>
   </div>
