@@ -1,4 +1,8 @@
+require_relative 'metadata_processor'
+
 class User
+  include MetadataProcessor
+
   def initialize(user_id, db)
     @db = db
     @profile = self.class.profile(user_id, db)
@@ -84,7 +88,8 @@ class User
       ORDER BY p.id;
     QUERY
 
-    @db.query(self.username, sql)
+    result = @db.query(self.username, sql)
+    merge_metadata(result)
   end
 end
 
