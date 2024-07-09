@@ -153,7 +153,6 @@ get '/profile' do
 
   @username = @user.username
   @profile = @user.profile
-  # @posts = merge_metadata(@user.posts)
   @posts = @user.posts
 
   erb :profile, layout: :layout
