@@ -46,18 +46,16 @@ class User
     QUERY
 
     @db.query(new_name, new_email, old_name, old_email, sql)
-    user_id = @profile['id']
-    @profile = self.class.profile(user_id, @db)
+    @profile = self.class.profile(@id, @db)
   end
 
   def delete!
-    user_id = @user.id
     sql = <<~QUERY
       DELETE FROM users
        WHERE id = $1;
     QUERY
 
-    @db.query(user_id, sql)
+    @db.query(@id, sql)
   end
 
   def add_post!(username, description)
@@ -67,7 +65,7 @@ class User
       VALUES ($1, $2);
     QUERY
 
-    @db.query(@user.id, description, sql)
+    @db.query(@id, description, sql)
   end
 
   def delete_post!(post_id)
