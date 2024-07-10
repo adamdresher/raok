@@ -21,8 +21,10 @@
   </article>
 </div>
 
-<div>
-  <form action="/kindness/<%== @kindness['post_id'] %>/delete" method="post">
-    <button type="submit">Delete Kindness</button>
-  </form>
-</div>
+<% if @logged_in %>
+  <div>
+    <form action="/kindness/<%== @kindness['post_id'] %>/delete" method="post">
+      <button type="submit">Delete Kindness</button>
+    </form>
+  </div>
+<% end %>

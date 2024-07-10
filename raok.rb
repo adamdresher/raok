@@ -205,11 +205,14 @@ post '/kindness/new' do
 
   @user.add_post!(username, description)
 
-  redirect '/user-kindnesses'
+  redirect '/'
 end
 
 get '/kindness/:kindness_id' do
   id = params[:kindness_id].to_i
+
+  post = @storage.post(id)
+  @logged_in = (@user.username == post['posted_by'])
 
   @kindness = @storage.post(id)
 
@@ -222,7 +225,7 @@ post '/kindness/:kindness_id/delete' do
 
   @user.delete_post!(id)
 
-  redirect '/user'
+  redirect '/'
 end
 
 post '/kindness/:kindness_id/like' do
