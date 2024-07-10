@@ -211,10 +211,8 @@ end
 get '/kindness/:kindness_id' do
   id = params[:kindness_id].to_i
 
-  post = @storage.post(id)
-  @valid_user = (@user.username == post['posted_by'])
-
   @kindness = @storage.post(id)
+  @valid_user = (@user.username == @kindness['posted_by'])
 
   erb :kindness, layout: :layout
 end
