@@ -212,7 +212,7 @@ get '/kindness/:kindness_id' do
   id = params[:kindness_id].to_i
 
   post = @storage.post(id)
-  @logged_in = (@user.username == post['posted_by'])
+  @valid_user = (@user.username == post['posted_by'])
 
   @kindness = @storage.post(id)
 

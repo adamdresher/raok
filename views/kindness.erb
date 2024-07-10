@@ -21,7 +21,7 @@
   </article>
 </div>
 
-<% if @logged_in %>
+<% if @valid_user %>
   <div>
     <form action="/kindness/<%== @kindness['post_id'] %>/delete" method="post">
       <button type="submit">Delete Kindness</button>
