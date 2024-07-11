@@ -6,15 +6,24 @@
 
     <div class="post metadata current">
       <p>Kindness by <%== @kindness['posted_by'] %></p>
+
       <p>
-        <% if @kindness['liked_by'] %>
-          <img src="/icons/like-on.png" width="12" height="12">
-        <% else %>
-          <img src="/icons/like-off.png" width="12" height="12">
+        <% if @valid_user %>
+          <form action="/kindness/<%== @kindness['post_id'] %>/like" method="post">
+
+            <% if @kindness['liked_by'] && @kindness['liked_by'].include?(@user.username) %> <!-- liked by should match @user.name -->
+              <input type="image" name="like" value="like" src="/icons/like-on.png" width="12" height="12">
+            <% else %>
+              <input type="image" name="like" value="unlike" src="/icons/like-off.png" width="12" height="12">
+            <% end %>
+
+          </form>
         <% end %>
         <%== format_likes_from(@kindness['liked_by']) %>
       </p>
+
       <p>
+        <!-- need a button and input field -->
         <img src="/icons/comments.png" width="12" height="12"> <%== @kindness['comment'] ? @kindness['comment'].count : 0 %>
       </p>
     </div>

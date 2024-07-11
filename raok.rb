@@ -212,7 +212,7 @@ get '/kindness/:kindness_id' do
   id = params[:kindness_id].to_i
 
   @kindness = @storage.post(id)
-  @valid_user = (@user.username == @kindness['posted_by'])
+  @valid_user = (@user && @user.username == @kindness['posted_by'])
 
   erb :kindness, layout: :layout
 end
@@ -227,7 +227,18 @@ post '/kindness/:kindness_id/delete' do
 end
 
 post '/kindness/:kindness_id/like' do
+  post_id = params[:kindness_id].to_i
+
+  @user.toggle_like!(post_id)
+
+  redirect '/'
 end
 
 post '/kindness/:kindness_id/comment' do
+  post_id = params[:kindness_id].to_i
+  comment = params['comment']
+
+  @user.add_comment!(post_id, comment)
+
+  redirect '/'
 end

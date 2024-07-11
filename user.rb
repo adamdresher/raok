@@ -52,7 +52,7 @@ class User
   def delete!
     sql = <<~QUERY
       DELETE FROM users
-       WHERE id = $1;
+            WHERE id = $1;
     QUERY
 
     @db.query(@id, sql)
@@ -61,8 +61,8 @@ class User
   def add_post!(username, description)
     sql = <<~QUERY
       INSERT INTO posts
-             (user_id, description)
-      VALUES ($1, $2);
+                  (user_id, description)
+           VALUES ($1, $2);
     QUERY
 
     @db.query(@id, description, sql)
@@ -71,10 +71,38 @@ class User
   def delete_post!(post_id)
     sql = <<~QUERY
       DELETE FROM posts
-       WHERE id = $1;
+            WHERE id = $1;
     QUERY
 
     @db.query(post_id, sql)
+  end
+
+  def toggle_like!(post_id)
+    like_state = post_liked?(post_id)
+    like_sql = <<~QUERY
+                    INSERT INTO likes
+                                (post_id, user_id)
+                         VALUES ($1, $2);
+               QUERY
+    unlike_sql = <<~QUERY
+                      DELETE FROM likes
+                            WHERE post_id = $1 AND user_id = $2;
+                    QUERY
+
+    sql = (like_state ? unlike_sql : like_sql)
+    user_id = id
+
+    @db.query(post_id, user_id, sql)
+  end
+
+  def add_comment!(post_id, comment)
+    sql = <<~QUERY
+      INSERT INTO comments
+                  (post_id, user_id, description)
+           VALUES ($1, $2, $3);
+    QUERY
+
+    @db.query(post_id, @id, comment, sql)
   end
 
   def posts
@@ -103,6 +131,12 @@ class User
 
     result = @db.query(self.username, sql)
     merge_metadata(result)
+  end
+
+  private
+
+  def post_liked?(id)
+    posts[id]['liked_by'] && posts[id]['liked_by'].include?(username)
   end
 end
 
