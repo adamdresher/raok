@@ -29,7 +29,7 @@
       <div class="post metadata">
         <p>Kindness by <%== v['posted_by'] %></p>
         <p>
-          <% if v['liked_by'] %>
+          <% if user_likes(v) %>
             <img src="/icons/like-on.png" width="12" height="12"> <%== v['liked_by'] ? v['liked_by'].count : 0 %>
           <% else %>
             <img src="/icons/like-off.png" width="12" height="12"> <%== v['liked_by'] ? v['liked_by'].count : 0 %>

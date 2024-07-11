@@ -79,7 +79,8 @@ helpers do
     end
   end
 
-  def post_has_likes?(posts, id)
+  def user_likes(post)
+    post['liked_by'] && post['liked_by'].include?(@user.username)
   end
 end
 
@@ -212,7 +213,7 @@ get '/kindness/:kindness_id' do
   id = params[:kindness_id].to_i
 
   @kindness = @storage.post(id)
-  @valid_user = (@user && @user.username == @kindness['posted_by'])
+  @user_created_kindness = (@user && @user.username == @kindness['posted_by'])
 
   erb :kindness, layout: :layout
 end
