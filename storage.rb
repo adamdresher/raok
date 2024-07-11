@@ -26,6 +26,15 @@ class Storage
     @db.query(*user_data, sql)
   end
 
+  def delete_user!(user)
+    sql = <<~QUERY
+      DELETE FROM users
+            WHERE id = $1;
+    QUERY
+
+    @db.query(user.id, sql)
+  end
+
   def encrypted_password_for(username)
     sql = <<~QUERY
       SELECT password FROM users

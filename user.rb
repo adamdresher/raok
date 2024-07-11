@@ -38,15 +38,6 @@ class User
     @profile = self.class.profile(@id, @db)
   end
 
-  def delete!
-    sql = <<~QUERY
-      DELETE FROM users
-            WHERE id = $1;
-    QUERY
-
-    @db.query(@id, sql)
-  end
-
   def posts
     sql = <<~QUERY
         SELECT p.id AS post_id,

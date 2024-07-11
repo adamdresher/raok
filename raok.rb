@@ -184,7 +184,7 @@ end
 post '/user/delete' do
   session[:message] = "#{@user.username} has been deleted"
 
-  @user.delete!
+  @storage.delete_user!(@user)
   @user = nil
 
   session.delete(:current_user)
