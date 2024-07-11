@@ -8,25 +8,26 @@
       <p>Kindness by <%== @kindness['posted_by'] %></p>
 
       <p>
-        <% if @valid_user %>
-          <form action="/kindness/<%== @kindness['post_id'] %>/like" method="post">
+        <% if @user %>
 
-            <% if @kindness['liked_by'] && @kindness['liked_by'].include?(@user.username) %>
+          <form action="/kindness/<%== @kindness['post_id'] %>/like" method="post">
+            <% if @kindness['liked_by'] %>
               <input type="image" name="like" value="like" src="/icons/like-on.png" width="12" height="12">
             <% else %>
               <input type="image" name="like" value="unlike" src="/icons/like-off.png" width="12" height="12">
             <% end %>
+          </form>
+
         <% else %>
-            <% if @kindness['liked_by'] %>
-              <img src="/icons/like-on.png" width="12" height="12">
-            <% else %>
-              <img src="/icons/like-off.png" width="12" height="12">
-            <% end %>
+
+          <% if @kindness['liked_by'] %>
+            <img src="/icons/like-on.png" width="12" height="12">
+          <% else %>
+            <img src="/icons/like-off.png" width="12" height="12">
+          <% end %>
+
         <% end %>
 
-        <% if @valid_user %>
-          </form>
-        <% end %>
         <%== format_likes_from(@kindness['liked_by']) %>
       </p>
 
