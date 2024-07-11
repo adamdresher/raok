@@ -26,17 +26,6 @@ class User
     result.first['id']
   end
 
-  def self.profile(user_id, db)
-    sql = <<~QUERY
-      SELECT id, name, email, username FROM users
-       WHERE id = $1;
-    QUERY
-
-    result = db.query(user_id, sql)
-
-    result.first
-  end
-
   def update_profile!(old_name, old_email, new_name, new_email)
     sql = <<~QUERY
       UPDATE users
@@ -56,6 +45,34 @@ class User
     QUERY
 
     @db.query(@id, sql)
+  end
+
+  def posts
+    sql = <<~QUERY
+        SELECT p.id AS post_id,
+               u.username AS posted_by,
+               p.description AS description,
+               l_user.username AS liked_by,
+               c.id AS comment_id,
+               c_user.username AS commented_by,
+               c.description AS comment
+          FROM posts AS p
+          JOIN users AS u
+            ON u.id = p.user_id
+     LEFT JOIN likes AS l
+            ON p.id = l.post_id
+     LEFT JOIN users AS l_user
+            ON l.user_id = l_user.id
+     LEFT JOIN comments AS c
+            ON p.id = c.post_id
+     LEFT JOIN users AS c_user
+            ON c.user_id = c_user.id
+         WHERE u.username = $1
+      ORDER BY p.id;
+    QUERY
+
+    result = @db.query(self.username, sql)
+    merge_metadata(result)
   end
 
   def add_post!(username, description)
@@ -105,35 +122,18 @@ class User
     @db.query(post_id, @id, comment, sql)
   end
 
-  def posts
+  private
+
+  def self.profile(user_id, db)
     sql = <<~QUERY
-        SELECT p.id AS post_id,
-               u.username AS posted_by,
-               p.description AS description,
-               l_user.username AS liked_by,
-               c.id AS comment_id,
-               c_user.username AS commented_by,
-               c.description AS comment
-          FROM posts AS p
-          JOIN users AS u
-            ON u.id = p.user_id
-     LEFT JOIN likes AS l
-            ON p.id = l.post_id
-     LEFT JOIN users AS l_user
-            ON l.user_id = l_user.id
-     LEFT JOIN comments AS c
-            ON p.id = c.post_id
-     LEFT JOIN users AS c_user
-            ON c.user_id = c_user.id
-         WHERE u.username = $1
-      ORDER BY p.id;
+      SELECT id, name, email, username FROM users
+       WHERE id = $1;
     QUERY
 
-    result = @db.query(self.username, sql)
-    merge_metadata(result)
-  end
+    result = db.query(user_id, sql)
 
-  private
+    result.first
+  end
 
   def post_liked?(id)
     public_posts = all_posts
