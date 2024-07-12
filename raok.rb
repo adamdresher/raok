@@ -67,7 +67,12 @@ def user_profile(params)
 end
 
 helpers do
-  def format_likes_from(users)
+  def format_likes_from(users, current_user)
+    if users.include?(current_user)
+      users.delete(current_user)
+      current_user = 'you'
+      users.prepend(current_user)
+    end
     count = users.class == Array ? users.size : 0
 
     case count
