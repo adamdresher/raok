@@ -84,7 +84,7 @@ helpers do
     end
   end
 
-  def user_likes(post)
+  def user_likes?(post)
     post['liked_by'] && post['liked_by'].include?(@user.username)
   end
 end

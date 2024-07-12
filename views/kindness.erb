@@ -11,7 +11,7 @@
         <% if @user %>
 
           <form action="/kindness/<%== @kindness['post_id'] %>/like" method="post">
-            <% if user_likes(@kindness) %>
+            <% if user_likes?(@kindness) %>
               <input type="image" name="like" value="like" src="/icons/like-on.png" width="12" height="12">
             <% else %>
               <input type="image" name="like" value="unlike" src="/icons/like-off.png" width="12" height="12">
@@ -20,7 +20,7 @@
 
         <% else %>
 
-          <% if user_likes(@kindness) %>
+          <% if user_likes?(@kindness) %>
             <img src="/icons/like-on.png" width="12" height="12">
           <% else %>
             <img src="/icons/like-off.png" width="12" height="12">

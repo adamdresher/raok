@@ -6,28 +6,28 @@
     </a>
   </article>
 
-  <% @posts.each_pair do |k, v| %>
+  <% @posts.each_pair do |id, post| %>
 
     <article class="post">
       <div class="post content">
-        <p><%== v['description'] %></p>
+        <p><%== post['description'] %></p>
       </div>
 
       <div class="post metadata">
         <p>
-          Kindness by <%== v['posted_by'] %>
+          Kindness by <%== post['posted_by'] %>
         </p>
         <p>
-          <% if user_likes(v) %>
-            <img src="/icons/like-on.png" width="12" height="12"> <%== v['liked_by'] ? v['liked_by'].count : 0 %>
+          <% if user_likes?(post) %>
+            <img src="/icons/like-on.png" width="12" height="12"> <%== post['liked_by'] ? post['liked_by'].count : 0 %>
           <% else %>
-            <img src="/icons/like-off.png" width="12" height="12"> <%== v['liked_by'] ? v['liked_by'].count : 0 %>
+            <img src="/icons/like-off.png" width="12" height="12"> <%== post['liked_by'] ? post['liked_by'].count : 0 %>
           <% end %>
-          <img src="/icons/comments.png" width="12" height="12"> <%== v['comment'] ? v['comment'].count : 0 %>
+          <img src="/icons/comments.png" width="12" height="12"> <%== post['comment'] ? post['comment'].count : 0 %>
         </p>
       </div>
 
-      <a href="/kindness/<%== k %>">
+      <a href="/kindness/<%== id %>">
         <span></span>
       </a>
     </article>
