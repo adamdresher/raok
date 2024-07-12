@@ -68,7 +68,7 @@ end
 
 helpers do
   def format_likes_from(users, current_user)
-    if users.include?(current_user)
+    if current_user && users.include?(current_user)
       users.delete(current_user)
       current_user = 'you'
       users.prepend(current_user)
@@ -85,7 +85,7 @@ helpers do
   end
 
   def user_likes?(post)
-    post['liked_by'] && post['liked_by'].include?(@user.username)
+    post['liked_by'] && @user && post['liked_by'].include?(@user.username)
   end
 end
 
