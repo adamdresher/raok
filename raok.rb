@@ -68,7 +68,7 @@ end
 
 helpers do
   def format_likes_from(users, current_user)
-    if current_user && users.include?(current_user)
+    if users && current_user && users.include?(current_user)
       users.delete(current_user)
       current_user = 'you'
       users.prepend(current_user)
