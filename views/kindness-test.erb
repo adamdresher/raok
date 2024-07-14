@@ -12,24 +12,24 @@
 
           <form action="/kindness/<%== @kindness['post_id'] %>/like" method="post">
             <% if user_likes?(@kindness) %>
-              <input type="image" src="/icons/like-on.png" width="12" height="12">
+              <input type="image" src="/icons/like-on.png" width="12" height="12" class="">
             <% else %>
-              <input type="image" src="/icons/like-off.png" width="12" height="12">
+              <input type="image" src="/icons/like-off.png" width="12" height="12" class="">
             <% end %>
           </form>
 
         <% else %>
 
           <% if user_likes?(@kindness) %>
-            <img src="/icons/like-on.png" width="12" height="12">
+            <img src="/icons/like-on.png" width="12" height="12" class="">
           <% else %>
-            <img src="/icons/like-off.png" width="12" height="12">
+            <img src="/icons/like-off.png" width="12" height="12" class="">
           <% end %>
 
         <% end %>
 
-          <p>
-            <%== format_likes_from(@kindness['liked_by'], @user.username) %>
+          <p class="">
+            <%== format_likes_from(@kindness['liked_by'], @user) %>
           </p>
       </div>
 
