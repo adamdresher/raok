@@ -115,6 +115,7 @@ article.post .content {
   align-content: center;
 }
 
+/* metadata container */
 article.post .metadata {
   background-color: #84C7AB;
   box-sizing: border-box;
@@ -125,12 +126,14 @@ article.post .metadata {
   text-align: left;
 }
 
+/* metadata content */
 article.post .metadata p {
   margin-bottom: 0rem;
   display:flex;
   justify-content: space-between;
 }
 
+/* post dimensions scale relatively */
 article.post span {
   position: absolute;
   width: 100%;
@@ -139,51 +142,55 @@ article.post span {
   top: 0;
 }
 
-div #current-post {
+/* post container */
+div.current.post {
   display: flex;
   justify-content: center;
 }
 
-div #current-content {
-  align-content: center;
-}
-
-article.post.current {
+/* post */
+article.current.post {
   margin: 3rem;
   width: 60%;
-  padding-bottom: 100%;
 }
 
-article.post .content.current {
+/* content container */
+article.current.post .content {
   position: relative;
   width: 100%;
   padding-bottom: 100%;
-  display: flex;
+  /* display: flex; */
   justify-content: center;
   align-items: center;
 }
 
-/*
- * ensuring the text doesn't overflow the container
-article.post .content.current p {
-  margin: 0;
-  text-align: center;
-  word-wrap: break-word;
-  max-width: 100%;
-}
-*/
-
-article.post .metadata.current {
+/* metadata container */
+article.current.post .metadata {
   position: relative;
   width: 100%;
+  display: grid;
   justify-content: start;
 }
 
-article.post .metadata.current p {
+/* metadata likes */
+article.current.post .metadata .likes {
+  display: inline-block;
+}
+
+/*
+/* metadata content 
+article.current.post .metadata p {
   margin-bottom: 0rem;
   display:flex;
   justify-content: start;
 }
+*/
+
+/*
+div.likes {
+  display: inline-block;
+}
+*/
 
 article.post.new_post {
   position: relative;
@@ -198,18 +205,18 @@ article.post.new_post {
   text-align: center;
 }
 
-.form-box {
+.form-container {
   display: inline-block;
 }
 
-.field {
+.form-field {
   display: block;
   text-align: right;
   font-family: sans-serif;
   font-size: 1rem;
 }
 
-.field-button {
+.form-button {
   text-align: right;
 }
 

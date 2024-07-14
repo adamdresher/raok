@@ -5,38 +5,43 @@
     </div>
 
     <div class="metadata">
-      <p>Kindness by <%== @kindness['posted_by'] %></p>
+      <p class="likes">
+        Kindness by <%== @kindness['posted_by'] %>
+      </p>
 
       <div>
         <% if @user %>
 
-          <form action="/kindness/<%== @kindness['post_id'] %>/like" method="post">
+          <form action="/kindness/<%== @kindness['post_id'] %>/like" method="post" class="likes">
             <% if user_likes?(@kindness) %>
-              <input type="image" src="/icons/like-on.png" width="12" height="12">
+              <input type="image" src="/icons/like-on.png" width="12" height="12" class="likes">
             <% else %>
-              <input type="image" src="/icons/like-off.png" width="12" height="12">
+              <input type="image" src="/icons/like-off.png" width="12" height="12" class="likes">
             <% end %>
           </form>
 
         <% else %>
 
           <% if user_likes?(@kindness) %>
-            <img src="/icons/like-on.png" width="12" height="12">
+            <img src="/icons/like-on.png" width="12" height="12" class="likes">
           <% else %>
-            <img src="/icons/like-off.png" width="12" height="12">
+            <img src="/icons/like-off.png" width="12" height="12" class="likes">
           <% end %>
 
         <% end %>
 
-          <p>
+          <p class="likes">
             <%== format_likes_from(@kindness['liked_by'], @user) %>
           </p>
       </div>
 
-      <p>
+      <div>
         <!-- need a button and input field -->
-        <img src="/icons/comments.png" width="12" height="12"> <%== @kindness['comment'] ? @kindness['comment'].count : 0 %>
-      </p>
+        <img src="/icons/comments.png" width="12" height="12" class="likes">
+        <p class="likes">
+          <%== @kindness['comment'] ? @kindness['comment'].count : 0 %>
+        </p>
+      </div>
     </div>
   </article>
 </div>
