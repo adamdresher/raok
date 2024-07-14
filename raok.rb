@@ -201,7 +201,7 @@ end
 get '/kindness/new' do
   return_home_unless_signed_in
 
-  erb :new_kindness, layout: :layout
+  erb :new_post, layout: :layout
 end
 
 post '/kindness/new' do
@@ -214,34 +214,34 @@ post '/kindness/new' do
   redirect '/'
 end
 
-get '/kindness/:kindness_id' do
-  id = params[:kindness_id].to_i
+get '/kindness/:post_id' do
+  id = params[:post_id].to_i
 
-  @kindness = @storage.post(id)
-  @user_created_kindness = (@user && @user.username == @kindness['posted_by'])
+  @post = @storage.post(id)
+  @user_created_post = (@user && @user.username == @post['posted_by'])
 
-  erb :kindness, layout: :layout
+  erb :post, layout: :layout
 end
 
-post '/kindness/:kindness_id/delete' do
+post '/kindness/:post_id/delete' do
   session[:message] = "Your post has been deleted"
-  id = params[:kindness_id].to_i
+  id = params[:post_id].to_i
 
   @user.delete_post!(id)
 
   redirect '/'
 end
 
-post '/kindness/:kindness_id/like' do
-  post_id = params[:kindness_id].to_i
+post '/kindness/:post_id/like' do
+  post_id = params[:post_id].to_i
 
   @user.toggle_like!(post_id)
 
   redirect '/'
 end
 
-post '/kindness/:kindness_id/comment' do
-  post_id = params[:kindness_id].to_i
+post '/kindness/:post_id/comment' do
+  post_id = params[:post_id].to_i
   comment = params['comment']
 
   @user.add_comment!(post_id, comment)
