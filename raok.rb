@@ -220,6 +220,9 @@ get '/kindness/:post_id' do
 
   @post = @storage.post(id)
   @user_created_post = (@user && @user.username == @post['posted_by'])
+  if @post['comment'] && !signed_in?
+    @first_comment = @post['comment'].shift.last
+  end
 
   erb :post, layout: :layout
 end

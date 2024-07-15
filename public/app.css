@@ -132,11 +132,6 @@ article.post .metadata .line {
   margin-bottom: 0rem;
 }
 
-/* metadata icon */
-article.post .metadata .icon {
-  padding-top: 0.75rem;
-}
-
 /* post dimensions scale relatively */
 article.post span {
   position: absolute;
@@ -170,15 +165,21 @@ article.current.post .content {
 /* current post metadata container */
 article.current.post .metadata {
   position: relative;
-  display: grid;
+  display: table;
   justify-content: start;
-  padding: 0.2rem 1rem 0.5rem 1rem;
+  padding: 1rem 1rem 0.5rem 1rem;
   width: 100%;
 }
 
-/* current post metadata lines */
-article.current.post .metadata td :first-child {
-  margin: 0.5rem auto 0.2rem auto;
+/* current post comment field */
+#comment-field {
+  width: 80%;
+  margin: 1rem auto;
+}
+
+/* current post comment lines */
+td p {
+  margin: 0 auto 0.5rem auto;
 }
 
 article.post.new_post {

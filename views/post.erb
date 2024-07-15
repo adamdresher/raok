@@ -19,20 +19,20 @@
         <td>
           <% if @user %>
 
-            <form action="/kindness/<%== @post['post_id'] %>/like" method="post" >
+            <form action="/kindness/<%== @post['post_id'] %>/like" method="post">
               <% if user_likes?(@post) %>
-                <input type="image" src="/icons/like-on.png" width="12" height="12" >
+                <input type="image" src="/icons/like-on.png" width="18" height="18" class="icon">
               <% else %>
-                <input type="image" src="/icons/like-off.png" width="12" height="12" >
+                <input type="image" src="/icons/like-off.png" width="18" height="18" class="icon">
               <% end %>
             </form>
 
           <% else %>
 
             <% if user_likes?(@post) %>
-              <img src="/icons/like-on.png" width="12" height="12" >
+              <img src="/icons/like-on.png" width="18" height="18" class="icon">
             <% else %>
-              <img src="/icons/like-off.png" width="12" height="12" >
+              <img src="/icons/like-off.png" width="18" height="18" class="icon">
             <% end %>
 
           <% end %>
@@ -44,19 +44,19 @@
         </td>
       </tr>
 
-      <tr>
-        <td>
-          <img src="/icons/comments.png" width="12" height="12" >
-        </td>
-        <td>
-          <form action="/kindness/<%== @post['post_id'] %>/comment/new" method="post">
-            <input input="text" name="new-comment">
-            <button type="submit">Submit</button>
-          </form>
-        </td>
-      </tr>
+      <% if @user && @post['comment'] %>
 
-      <% if @post['comment'] %>
+        <tr id="comment-line">
+          <td>
+            <img src="/icons/comments.png" width="18" height="18" class="icon">
+          </td>
+          <td>
+            <form action="/kindness/<%== @post['post_id'] %>/comment/new" method="post">
+              <input input="text" name="new-comment" id="comment-field">
+              <button type="submit">Submit</button>
+            </form>
+          </td>
+        </tr>
         <% @post['comment'].each_pair do |_, comment| %>
           <tr>
             <td>
@@ -66,6 +66,59 @@
             </td>
           </tr>
         <% end %>
+
+      <% elsif !@user && @post['comment'] %>
+
+        <tr>
+          <td>
+            <img src="/icons/comments.png" width="18" height="18" class="icon">
+          </td>
+          <td>
+            <p><b><%== @first_comment['commented_by'] %></b>: <%== @first_comment['comment'] %></p>
+          </td>
+        </tr>
+        <% @post['comment'].each_pair do |_, comment| %>
+          <tr>
+            <td>
+            </td>
+            <td>
+              <p><b><%== comment['commented_by'] %></b>: <%== comment['comment'] %></p>
+            </td>
+          </tr>
+        <% end %>
+
+      <% elsif @user && !@post['comment'] %>
+
+        <tr id="comment-line">
+          <td>
+            <img src="/icons/comments.png" width="18" height="18" class="icon">
+          </td>
+          <td>
+            <form action="/kindness/<%== @post['post_id'] %>/comment/new" method="post">
+              <input input="text" name="new-comment" id="comment-field">
+              <button type="submit">Submit</button>
+            </form>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <p>No comments yet</p>
+          </td>
+        </tr>
+
+      <% else %>
+
+        <tr id="comment-line">
+          <td>
+            <img src="/icons/comments.png" width="18" height="18" class="icon">
+          </td>
+          <td>
+            <p>No comments yet</p>
+          </td>
+        </tr>
+
       <% end %>
 
     </table>
