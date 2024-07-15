@@ -3,52 +3,75 @@ module MetadataProcessor
 
   def merge_metadata(posts) # posts is a PG::Result object which has access to Enumerable methods
     merged_posts = {}
-    lists = ['liked_by', 'comment']
-    strings = ['post_id', 'posted_by', 'description']
 
     posts.each do |post|
       id = post['post_id'].to_i
-      comment = { 'comment' => post['comment'],
-                  'commented_by' => post['commented_by'] }
 
-      # creates post
-      # adds post wo comments/likes
       unless merged_posts[id]
-        merged_posts[id] = {}
-
-        strings.each do |string|
-          merged_posts[id][string] = post[string]
-        end
+        merged_posts.merge! create_new_post(post, id)
       end
 
-      lists.each do |list|
-        if post[list]
-
-          # updates post
-          # adds extra comments/likes
-          if (merged_posts[id][list].class == Array) && !merged_posts[id][list].include?(post[list])
-
-            if list == 'commented_id'
-              merged_posts[id]['comment_id'] << comment
-            elsif list == 'liked_by'
-              merged_posts[id]['liked_by'] << post[list]
-            end
-          end
-
-          # updates post
-          # adds first comment/like
-          unless merged_posts[id][list]
-            if list == 'comment'
-              merged_posts[id][list] = { post['comment_id'] => comment }
-            elsif list == 'liked_by'
-              merged_posts[id][list] = [post[list]]
-            end
-          end
-        end
-      end
+      merged_posts[id] = add_metadata!(merged_posts[id], post)
     end
 
     merged_posts
+  end
+
+  def create_new_post(data, id)
+    strings = ['post_id', 'posted_by', 'description']
+    post = {}
+
+    strings.each do |string|
+      post[string] = data[string]
+    end
+
+    { id => post }
+  end
+
+  def add_metadata!(post, data)
+    add_likes!(post, data)
+    add_comments!(post, data)
+
+    post
+  end
+
+  def add_likes!(post, data) # mutates posts
+    return unless data['liked_by']
+
+    id = data['post_id'].to_i
+    liked_by = 'liked_by'
+
+    if post[liked_by]
+      # adds a like if the user isn't included
+      unless post[liked_by].include? data[liked_by]
+        post[liked_by] << data[liked_by]
+      end
+    else
+    # starts a list of likes if if doesn't exist
+      post[liked_by] = [data[liked_by]]
+    end
+
+    post
+  end
+
+  def add_comments!(post, data) # mutates posts
+    return unless data['comment']
+
+    id = data['comment_id'].to_i
+    comment = 'comment'
+    new_comment = { comment => data[comment], 'commented_by' => data['commented_by'] }
+
+    if post[comment]
+      # adds a comment if comments already exists
+      unless post[comment].include? data['comment_id']
+        post[comment].merge!(id => new_comment)
+      end
+    else
+      # starts a list of comments if it doesn't exist
+      post[comment] = { id => new_comment }
+    end
+
+    post
   end
 end
 

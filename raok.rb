@@ -91,6 +91,7 @@ end
 
 # Routes
 get '/' do
+
   @posts = @storage.all_posts
 
   erb :index, layout: :layout
@@ -240,9 +241,9 @@ post '/kindness/:post_id/like' do
   redirect '/'
 end
 
-post '/kindness/:post_id/comment' do
+post '/kindness/:post_id/comment/new' do
   post_id = params[:post_id].to_i
-  comment = params['comment']
+  comment = params['new-comment']
 
   @user.add_comment!(post_id, comment)
 

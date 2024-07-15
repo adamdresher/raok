@@ -49,11 +49,25 @@
           <img src="/icons/comments.png" width="12" height="12" >
         </td>
         <td>
-          <p>
-            <%== @post['comment'] ? @post['comment'].count : 0 %>
-          </p>
+          <form action="/kindness/<%== @post['post_id'] %>/comment/new" method="post">
+            <input input="text" name="new-comment">
+            <button type="submit">Submit</button>
+          </form>
         </td>
       </tr>
+
+      <% if @post['comment'] %>
+        <% @post['comment'].each_pair do |_, comment| %>
+          <tr>
+            <td>
+            </td>
+            <td>
+              <p><b><%== comment['commented_by'] %></b>: <%== comment['comment'] %></p>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+
     </table>
   </article>
 </div>
