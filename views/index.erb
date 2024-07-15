@@ -14,17 +14,23 @@
       </div>
 
       <div class="post metadata">
-        <p>
-          Kindness by <%== post['posted_by'] %>
-        </p>
-        <p>
+        <div class="line">
+          <p>Kindness by <%== post['posted_by'] %></p>
+        </div>
+
+        <div class="line">
           <% if user_likes?(post) %>
-            <img src="/icons/like-on.png" width="12" height="12"> <%== post['liked_by'] ? post['liked_by'].count : 0 %>
+            <img src="/icons/like-on.png" width="12" height="12" class="icon">
           <% else %>
-            <img src="/icons/like-off.png" width="12" height="12"> <%== post['liked_by'] ? post['liked_by'].count : 0 %>
+            <img src="/icons/like-off.png" width="12" height="12" class="icon">
           <% end %>
-          <img src="/icons/comments.png" width="12" height="12"> <%== post['comment'] ? post['comment'].count : 0 %>
-        </p>
+
+          <p><%== post['liked_by'] ? post['liked_by'].count : 0 %></p>
+
+          <img src="/icons/comments.png" width="12" height="12" class="icon">
+
+          <p><%== post['comment'] ? post['comment'].count : 0 %></p>
+        </div>
       </div>
 
       <a href="/kindness/<%== id %>">
