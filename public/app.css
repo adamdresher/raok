@@ -101,7 +101,6 @@ article.post {
   box-sizing: border-box;
   margin: 1rem;
   width: 10rem;
-  vertical-align: center;
   align-content: center;
   text-align: center;
 }
@@ -175,6 +174,11 @@ article.current.post .metadata {
   display: grid;
   justify-content: start;
   padding: 0.2rem 1rem 0.5rem 1rem;
+}
+
+/* current post metadata lines */
+article.current.post .metadata td :first-child {
+  margin: 0.5rem auto 0.2rem auto;
 }
 
 article.post.new_post {
