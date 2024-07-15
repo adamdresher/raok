@@ -127,9 +127,9 @@ article.post .metadata {
 
 /* metadata content */
 article.post .metadata .line {
-  margin-bottom: 0rem;
   display:flex;
   justify-content: space-between;
+  margin-bottom: 0rem;
 }
 
 /* metadata icon */
@@ -161,19 +161,19 @@ article.current.post {
 /* current post content container */
 article.current.post .content {
   position: relative;
-  width: 100%;
-  padding-bottom: 100%;
   justify-content: center;
   align-items: center;
+  padding-bottom: 100%;
+  width: 100%;
 }
 
 /* current post metadata container */
 article.current.post .metadata {
   position: relative;
-  width: 100%;
   display: grid;
   justify-content: start;
   padding: 0.2rem 1rem 0.5rem 1rem;
+  width: 100%;
 }
 
 /* current post metadata lines */
@@ -182,10 +182,10 @@ article.current.post .metadata td :first-child {
 }
 
 article.post.new_post {
+  background-color: #93DEBE;
   position: relative;
   display: inline-block;
   box-sizing: border-box;
-  background-color: #93DEBE;
   margin: 1rem;
   height: 10rem;
   width: 10rem;
@@ -200,9 +200,9 @@ article.post.new_post {
 
 .form-field {
   display: block;
-  text-align: right;
   font-family: sans-serif;
   font-size: 1rem;
+  text-align: right;
 }
 
 .form-button {
