@@ -129,6 +129,7 @@ article.post .metadata {
 article.post .metadata .line {
   display:flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 0rem;
 }
 
@@ -171,10 +172,23 @@ article.current.post .metadata {
   width: 100%;
 }
 
+/* current post metadata left */
+article.current.post .metadata .left {
+  align-items: right;
+}
+/* current post metadata center */
+article.current.post .metadata .center {
+  padding: 0 1rem;
+}
+
+/* current post metadata right */
+article.current.post .metadata .right {
+  align-items: left;
+}
+
 /* current post comment field */
 #comment-field {
-  width: 80%;
-  margin: 1rem auto;
+  width: 100%;
 }
 
 /* current post comment lines */
@@ -195,10 +209,12 @@ article.post.new_post {
   text-align: center;
 }
 
+/* authentication */
 .form-container {
   display: inline-block;
 }
 
+/* authentication */
 .form-field {
   display: block;
   font-family: sans-serif;
@@ -206,6 +222,7 @@ article.post.new_post {
   text-align: right;
 }
 
+/* authentication */
 .form-button {
   text-align: right;
 }

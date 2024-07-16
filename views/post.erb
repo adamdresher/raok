@@ -8,7 +8,7 @@
       <tr>
         <td>
         </td>
-        <td>
+        <td class="center">
           <p>
             Kindness by <%== @post['posted_by'] %>
           </p>
@@ -16,28 +16,28 @@
       </tr>
 
       <tr>
-        <td>
+        <td class="left">
           <% if @user %>
 
             <form action="/kindness/<%== @post['post_id'] %>/like" method="post">
               <% if user_likes?(@post) %>
-                <input type="image" src="/icons/like-on.png" width="18" height="18" class="icon">
+                <input type="image" src="/icons/like-on.png" width="18" height="18">
               <% else %>
-                <input type="image" src="/icons/like-off.png" width="18" height="18" class="icon">
+                <input type="image" src="/icons/like-off.png" width="18" height="18">
               <% end %>
             </form>
 
           <% else %>
 
             <% if user_likes?(@post) %>
-              <img src="/icons/like-on.png" width="18" height="18" class="icon">
+              <img src="/icons/like-on.png" width="18" height="18">
             <% else %>
-              <img src="/icons/like-off.png" width="18" height="18" class="icon">
+              <img src="/icons/like-off.png" width="18" height="18">
             <% end %>
 
           <% end %>
         </td>
-        <td>
+        <td class="center">
           <p>
             <%== format_likes_from(@post['liked_by'], @user) %>
           </p>
@@ -47,21 +47,23 @@
       <% if @user && @post['comment'] %>
 
         <tr id="comment-line">
-          <td>
-            <img src="/icons/comments.png" width="18" height="18" class="icon">
+          <td class="left">
+            <img src="/icons/comments.png" width="18" height="18">
           </td>
-          <td>
-            <form action="/kindness/<%== @post['post_id'] %>/comment/new" method="post">
+          <td class="center">
+            <form name="comment" action="/kindness/<%== @post['post_id'] %>/comment/new" method="post">
               <input input="text" name="new-comment" id="comment-field">
-              <button type="submit">Submit</button>
             </form>
+          </td>
+          <td class="right">
+            <input for="comment" type="image" src="/icons/paper-plane.png" width="18" height="18">
           </td>
         </tr>
         <% @post['comment'].each_pair do |_, comment| %>
           <tr>
             <td>
             </td>
-            <td>
+            <td class="center">
               <p><b><%== comment['commented_by'] %></b>: <%== comment['comment'] %></p>
             </td>
           </tr>
@@ -70,10 +72,10 @@
       <% elsif !@user && @post['comment'] %>
 
         <tr>
-          <td>
-            <img src="/icons/comments.png" width="18" height="18" class="icon">
+          <td class="left">
+            <img src="/icons/comments.png" width="18" height="18">
           </td>
-          <td>
+          <td class="center">
             <p><b><%== @first_comment['commented_by'] %></b>: <%== @first_comment['comment'] %></p>
           </td>
         </tr>
@@ -81,7 +83,7 @@
           <tr>
             <td>
             </td>
-            <td>
+            <td class="center">
               <p><b><%== comment['commented_by'] %></b>: <%== comment['comment'] %></p>
             </td>
           </tr>
@@ -90,20 +92,22 @@
       <% elsif @user && !@post['comment'] %>
 
         <tr id="comment-line">
-          <td>
-            <img src="/icons/comments.png" width="18" height="18" class="icon">
+          <td class="left">
+            <img src="/icons/comments.png" width="18" height="18">
           </td>
-          <td>
-            <form action="/kindness/<%== @post['post_id'] %>/comment/new" method="post">
+          <td class="center">
+            <form name="comment" action="/kindness/<%== @post['post_id'] %>/comment/new" method="post">
               <input input="text" name="new-comment" id="comment-field">
-              <button type="submit">Submit</button>
             </form>
+          </td>
+          <td class="right">
+            <input for="comment" type="image" src="/icons/paper-plane.png" width="18" height="18">
           </td>
         </tr>
         <tr>
           <td>
           </td>
-          <td>
+          <td class="center">
             <p>No comments yet</p>
           </td>
         </tr>
@@ -111,10 +115,10 @@
       <% else %>
 
         <tr id="comment-line">
-          <td>
-            <img src="/icons/comments.png" width="18" height="18" class="icon">
+          <td class="left">
+            <img src="/icons/comments.png" width="18" height="18">
           </td>
-          <td>
+          <td class="center">
             <p>No comments yet</p>
           </td>
         </tr>
