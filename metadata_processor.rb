@@ -58,17 +58,17 @@ module MetadataProcessor
     return unless data['comment']
 
     id = data['comment_id'].to_i
-    comment = 'comment'
+    comment, comments = 'comment', 'comments'
     new_comment = { comment => data[comment], 'commented_by' => data['commented_by'] }
 
-    if post[comment]
+    if post[comments]
       # adds a comment if comments already exists
-      unless post[comment].include? data['comment_id']
-        post[comment].merge!(id => new_comment)
+      unless post[comments].include? data['comment_id']
+        post[comments].merge!(id => new_comment)
       end
     else
       # starts a list of comments if it doesn't exist
-      post[comment] = { id => new_comment }
+      post[comments] = { id => new_comment }
     end
 
     post

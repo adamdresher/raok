@@ -34,7 +34,7 @@
           <% else %>
             <img src="/icons/like-off.png" width="12" height="12"> <%== post['liked_by'] ? post['liked_by'].count : 0 %>
           <% end %>
-          <img src="/icons/comments.png" width="12" height="12"> <%== post['comment'] ? post['comment'].count : 0 %>
+          <img src="/icons/comments.png" width="12" height="12"> <%== post['comments'] ? post['comments'].count : 0 %>
         </p>
 
         <a href="/kindness/<%== id %>">

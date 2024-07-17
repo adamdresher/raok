@@ -44,7 +44,7 @@
         </td>
       </tr>
 
-      <% if @user && @post['comment'] %>
+      <% if @user && @post['comments'] %>
 
         <tr id="comment-line">
           <td class="left">
@@ -59,7 +59,7 @@
             <input for="comment" type="image" src="/icons/paper-plane.png" width="18" height="18">
           </td>
         </tr>
-        <% @post['comment'].each_pair do |_, comment| %>
+        <% @post['comments'].each_pair do |_, comment| %>
           <tr>
             <td>
             </td>
@@ -69,7 +69,7 @@
           </tr>
         <% end %>
 
-      <% elsif !@user && @post['comment'] %>
+      <% elsif !@user && @post['comments'] %>
 
         <tr>
           <td class="left">
@@ -79,7 +79,7 @@
             <p><b><%== @first_comment['commented_by'] %></b>: <%== @first_comment['comment'] %></p>
           </td>
         </tr>
-        <% @post['comment'].each_pair do |_, comment| %>
+        <% @post['comments'].each_pair do |_, comment| %>
           <tr>
             <td>
             </td>
@@ -89,7 +89,7 @@
           </tr>
         <% end %>
 
-      <% elsif @user && !@post['comment'] %>
+      <% elsif @user && !@post['comments'] %>
 
         <tr id="comment-line">
           <td class="left">
