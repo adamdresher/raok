@@ -14,7 +14,9 @@ configure do
   enable :sessions
   set :session_secret, 'WTu3&CEJn@vG@9AdxLAV833R!rYTZ^2tiejq4kWh8UEsRmDZXa&nyvdWz$#&S#wT'
   set :erb, escape_html: true
+  set :last_route, '/' # sets the last route for redirecting to previous route
 end
+
 
 before do
   user_id = session[:current_user]
@@ -92,6 +94,7 @@ end
 # Routes
 get '/' do
 
+  settings.last_route = '/'
   @posts = @storage.all_posts
 
   erb :index, layout: :layout
@@ -163,6 +166,8 @@ get '/user' do
   @profile = @user.profile
   @posts = @user.posts
 
+  settings.last_route = '/user'
+
   erb :profile, layout: :layout
 end
 
@@ -212,12 +217,18 @@ post '/kindness/new' do
 
   @user.add_post!(username, description)
 
-  redirect '/'
+  case settings.last_route
+  when '/'
+    redirect '/'
+  when '/user'
+    redirect '/user'
+  end
 end
 
 get '/kindness/:post_id' do
   id = params[:post_id].to_i
 
+  settings.last_route = "/kindness/#{id}"
   @post = @storage.post(id)
   @user_created_post = (@user && @user.username == @post['posted_by'])
   if @post['comments'] && !signed_in?
@@ -241,7 +252,7 @@ post '/kindness/:post_id/like' do
 
   @user.toggle_like!(post_id)
 
-  redirect '/'
+  redirect settings.last_route
 end
 
 post '/kindness/:post_id/comment/new' do
@@ -250,5 +261,5 @@ post '/kindness/:post_id/comment/new' do
 
   @user.add_comment!(post_id, comment)
 
-  redirect '/'
+  redirect settings.last_route
 end
