@@ -10,7 +10,7 @@
         </td>
         <td class="center">
           <p>
-            Kindness by <%== @post['posted_by'] %>
+            Kindness by <a href="/user/<%== @post['user_id'] %>"><%== @post['posted_by'] %></a>
           </p>
         </td>
       </tr>
@@ -64,7 +64,7 @@
             <td>
             </td>
             <td class="center">
-              <p><b><%== comment['commented_by'] %></b>: <%== comment['comment'] %></p>
+              <p><a href="/user/<%== comment['user_id'] %>"><b><%== comment['commented_by'] %></b></a>: <%== comment['comment'] %></p>
             </td>
           </tr>
         <% end %>
@@ -76,7 +76,7 @@
             <img src="/icons/comments.png" width="18" height="18">
           </td>
           <td class="center">
-            <p><b><%== @first_comment['commented_by'] %></b>: <%== @first_comment['comment'] %></p>
+            <p><a href="/user/<%== comment['user_id'] %>"><b><%== comment['commented_by'] %></b></a>: <%== comment['comment'] %></p>
           </td>
         </tr>
         <% @post['comments'].each_pair do |_, comment| %>

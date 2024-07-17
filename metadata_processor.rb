@@ -18,7 +18,7 @@ module MetadataProcessor
   end
 
   def create_new_post(data, id)
-    strings = ['post_id', 'posted_by', 'description']
+    strings = ['post_id', 'posted_by', 'user_id', 'description']
     post = {}
 
     strings.each do |string|
@@ -59,7 +59,7 @@ module MetadataProcessor
 
     id = data['comment_id'].to_i
     comment, comments = 'comment', 'comments'
-    new_comment = { comment => data[comment], 'commented_by' => data['commented_by'] }
+    new_comment = { comment => data[comment], 'commented_by' => data['commented_by'], 'user_id' => data['comment_user_id'] }
 
     if post[comments]
       # adds a comment if comments already exists

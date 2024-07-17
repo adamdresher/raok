@@ -22,7 +22,7 @@
         <% if session[:current_user] %>
 
         <div class="profile_button">
-          <a href="/user"><img src="/icons/user.png"></a>
+          <a href="/user/<%== @user.id %>"><img src="/icons/user.png"></a>
         </div>
 
         <% else %>

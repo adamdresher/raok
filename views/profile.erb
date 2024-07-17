@@ -1,14 +1,16 @@
 <div>
   <h2><%== @username %></h2>
-  <div>
-    <form action="/user/edit" method="get">
-      <button type="submit">Edit Profile</button>
-    </form>
+  <% if @is_current_user_profile %>
+    <div>
+      <form action="/user/edit" method="get">
+        <button type="submit">Edit Profile</button>
+      </form>
 
-    <form action="/signout" method="post">
-      <button type="submit">Sign Out</button>
-    </form>
-  </div>
+      <form action="/signout" method="post">
+        <button type="submit">Sign Out</button>
+      </form>
+    </div>
+  <% end %>
 </div>
 
 <div class="feed">

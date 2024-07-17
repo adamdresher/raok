@@ -159,14 +159,18 @@ post '/signout' do
   redirect '/'
 end
 
-get '/user' do
+get '/user/:user_id' do
   return_home_unless_signed_in
 
-  @username = @user.username
-  @profile = @user.profile
-  @posts = @user.posts
+  user = User.new(params[:user_id], @db)
+  @username = user.username
+  @profile = user.profile
+  @posts = user.posts
+ 
+  # current user has access to editing target user's profile
+  @is_current_user_profile = (session[:current_user] == user.id)
 
-  settings.last_route = '/user'
+  settings.last_route = "/user/#{params[:user_id]}"
 
   erb :profile, layout: :layout
 end
@@ -190,7 +194,7 @@ post '/user/edit' do
 
   @user.update_profile!(old_name, old_email, new_name, new_email)
 
-  redirect '/user'
+  redirect "/user/#{@user.id}"
 end
 
 post '/user/delete' do
@@ -220,8 +224,8 @@ post '/kindness/new' do
   case settings.last_route
   when '/'
     redirect '/'
-  when '/user'
-    redirect '/user'
+  when "/user/#{@user.id}"
+    redirect "/user/#{@user.id}"
   end
 end
 
