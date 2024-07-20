@@ -7,7 +7,11 @@ gem 'puma'
 gem 'bcrypt'
 gem 'pg'
 gem 'minitest'
+gem 'rack-test'
 gem 'pry'
 gem 'pry-byebug'
 
-gem "rackup", "~> 2.1"
+gem "rackup"
+
+
+ruby '3.2.3'
