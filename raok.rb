@@ -1,5 +1,4 @@
 require 'sinatra'
-require 'sinatra/reloader'
 require 'tilt/erubis'
 require 'bcrypt'
 require 'pg'
@@ -13,10 +12,17 @@ require_relative 'user'
 configure do
   enable :sessions
   set :session_secret, 'WTu3&CEJn@vG@9AdxLAV833R!rYTZ^2tiejq4kWh8UEsRmDZXa&nyvdWz$#&S#wT'
+  # set :session_secret, ENV['SESSION_SECRET']
   set :erb, escape_html: true
   set :last_route, '/' # sets the last route for redirecting to previous route
 end
 
+configure(:development) do
+  require 'sinatra/reloader'
+  also_reload 'database_persistance.rb'
+  also_reload 'storage.rb'
+  also_reload 'user.rb'
+end
 
 before do
   user_id = session[:current_user]
@@ -159,22 +165,6 @@ post '/signout' do
   redirect '/'
 end
 
-get '/user/:user_id' do
-  return_home_unless_signed_in
-
-  user = User.new(params[:user_id], @db)
-  @username = user.username
-  @profile = user.profile
-  @posts = user.posts
- 
-  # current user has access to editing target user's profile
-  @is_current_user_profile = (session[:current_user] == user.id)
-
-  settings.last_route = "/user/#{params[:user_id]}"
-
-  erb :profile, layout: :layout
-end
-
 get '/user/edit' do
   return_home_unless_signed_in
 
@@ -206,6 +196,22 @@ post '/user/delete' do
   session.delete(:current_user)
 
   redirect '/'
+end
+
+get '/user/:user_id' do
+  return_home_unless_signed_in
+
+  user = User.new(params[:user_id], @db)
+  @username = user.username
+  @profile = user.profile
+  @posts = user.posts
+
+  # current user has access to editing target user's profile
+  @is_current_user_profile = (session[:current_user] == user.id)
+
+  settings.last_route = "/user/#{params[:user_id]}"
+
+  erb :profile, layout: :layout
 end
 
 get '/kindness/new' do
