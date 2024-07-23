@@ -33,7 +33,7 @@ CREATE TABLE public.comments (
 );
 
 
-ALTER TABLE public.comments OWNER TO asdresher;
+-- ALTER TABLE public.comments OWNER TO asdresher;
 
 --
 -- Name: comments_id_seq; Type: SEQUENCE; Schema: public; Owner: asdresher
@@ -48,7 +48,7 @@ CREATE SEQUENCE public.comments_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.comments_id_seq OWNER TO asdresher;
+-- ALTER TABLE public.comments_id_seq OWNER TO asdresher;
 
 --
 -- Name: comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: asdresher
@@ -69,7 +69,7 @@ CREATE TABLE public.favorites (
 );
 
 
-ALTER TABLE public.favorites OWNER TO asdresher;
+-- ALTER TABLE public.favorites OWNER TO asdresher;
 
 --
 -- Name: favorites_id_seq; Type: SEQUENCE; Schema: public; Owner: asdresher
@@ -84,7 +84,7 @@ CREATE SEQUENCE public.favorites_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.favorites_id_seq OWNER TO asdresher;
+-- ALTER TABLE public.favorites_id_seq OWNER TO asdresher;
 
 --
 -- Name: favorites_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: asdresher
@@ -104,7 +104,7 @@ CREATE TABLE public.hashtag_list (
 );
 
 
-ALTER TABLE public.hashtag_list OWNER TO asdresher;
+-- ALTER TABLE public.hashtag_list OWNER TO asdresher;
 
 --
 -- Name: hashtag_list_id_seq; Type: SEQUENCE; Schema: public; Owner: asdresher
@@ -119,7 +119,7 @@ CREATE SEQUENCE public.hashtag_list_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.hashtag_list_id_seq OWNER TO asdresher;
+-- ALTER TABLE public.hashtag_list_id_seq OWNER TO asdresher;
 
 --
 -- Name: hashtag_list_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: asdresher
@@ -139,7 +139,7 @@ CREATE TABLE public.hashtags (
 );
 
 
-ALTER TABLE public.hashtags OWNER TO asdresher;
+-- ALTER TABLE public.hashtags OWNER TO asdresher;
 
 --
 -- Name: hashtags_id_seq; Type: SEQUENCE; Schema: public; Owner: asdresher
@@ -154,7 +154,7 @@ CREATE SEQUENCE public.hashtags_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.hashtags_id_seq OWNER TO asdresher;
+-- ALTER TABLE public.hashtags_id_seq OWNER TO asdresher;
 
 --
 -- Name: hashtags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: asdresher
@@ -175,7 +175,7 @@ CREATE TABLE public.likes (
 );
 
 
-ALTER TABLE public.likes OWNER TO asdresher;
+-- ALTER TABLE public.likes OWNER TO asdresher;
 
 --
 -- Name: likes_id_seq; Type: SEQUENCE; Schema: public; Owner: asdresher
@@ -190,13 +190,57 @@ CREATE SEQUENCE public.likes_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.likes_id_seq OWNER TO asdresher;
+-- ALTER TABLE public.likes_id_seq OWNER TO asdresher;
 
 --
 -- Name: likes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: asdresher
 --
 
 ALTER SEQUENCE public.likes_id_seq OWNED BY public.likes.id;
+
+
+--
+-- Name: old_users; Type: TABLE; Schema: public; Owner: asdresher
+--
+
+CREATE TABLE public.old_users (
+    id integer NOT NULL,
+    name character varying(50) NOT NULL,
+    email character varying(50) NOT NULL,
+    username character varying(50) NOT NULL,
+    created_on timestamp with time zone DEFAULT now() NOT NULL,
+    last_login timestamp with time zone DEFAULT now() NOT NULL,
+    password character varying(50) DEFAULT 'password'::character varying NOT NULL,
+    CONSTRAINT users_email_check CHECK (((email)::text <> ''::text)),
+    CONSTRAINT users_email_valid CHECK (((email)::text ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'::text)),
+    CONSTRAINT users_name_check CHECK (((name)::text <> ''::text)),
+    CONSTRAINT users_password_check CHECK (((password)::text <> ''::text)),
+    CONSTRAINT users_username_check CHECK (((username)::text <> ''::text))
+);
+
+
+-- ALTER TABLE public.old_users OWNER TO asdresher;
+
+--
+-- Name: old_users_id_seq; Type: SEQUENCE; Schema: public; Owner: asdresher
+--
+
+CREATE SEQUENCE public.old_users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+-- ALTER TABLE public.old_users_id_seq OWNER TO asdresher;
+
+--
+-- Name: old_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: asdresher
+--
+
+ALTER SEQUENCE public.old_users_id_seq OWNED BY public.old_users.id;
 
 
 --
@@ -212,7 +256,7 @@ CREATE TABLE public.posts (
 );
 
 
-ALTER TABLE public.posts OWNER TO asdresher;
+-- ALTER TABLE public.posts OWNER TO asdresher;
 
 --
 -- Name: posts_id_seq; Type: SEQUENCE; Schema: public; Owner: asdresher
@@ -227,7 +271,7 @@ CREATE SEQUENCE public.posts_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.posts_id_seq OWNER TO asdresher;
+-- ALTER TABLE public.posts_id_seq OWNER TO asdresher;
 
 --
 -- Name: posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: asdresher
@@ -245,16 +289,17 @@ CREATE TABLE public.users (
     name character varying(50) NOT NULL,
     email character varying(50) NOT NULL,
     username character varying(50) NOT NULL,
+    password character varying(100) NOT NULL,
     created_on timestamp with time zone DEFAULT now() NOT NULL,
     last_login timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT users_email_check CHECK (((email)::text <> ''::text)),
-    CONSTRAINT users_email_valid CHECK (((email)::text ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'::text)),
-    CONSTRAINT users_name_check CHECK (((name)::text <> ''::text)),
-    CONSTRAINT users_username_check CHECK (((username)::text <> ''::text))
+    CONSTRAINT new_users_name_check CHECK (((name)::text <> ''::text)),
+    CONSTRAINT new_users_password_check CHECK (((password)::text <> ''::text)),
+    CONSTRAINT new_users_username_check CHECK (((username)::text <> ''::text)),
+    CONSTRAINT users_email_valid CHECK (((email)::text ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'::text))
 );
 
 
-ALTER TABLE public.users OWNER TO asdresher;
+-- ALTER TABLE public.users OWNER TO asdresher;
 
 --
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: asdresher
@@ -269,7 +314,7 @@ CREATE SEQUENCE public.users_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.users_id_seq OWNER TO asdresher;
+-- ALTER TABLE public.users_id_seq OWNER TO asdresher;
 
 --
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: asdresher
@@ -311,6 +356,13 @@ ALTER TABLE ONLY public.hashtags ALTER COLUMN id SET DEFAULT nextval('public.has
 --
 
 ALTER TABLE ONLY public.likes ALTER COLUMN id SET DEFAULT nextval('public.likes_id_seq'::regclass);
+
+
+--
+-- Name: old_users id; Type: DEFAULT; Schema: public; Owner: asdresher
+--
+
+ALTER TABLE ONLY public.old_users ALTER COLUMN id SET DEFAULT nextval('public.old_users_id_seq'::regclass);
 
 
 --
@@ -368,6 +420,30 @@ ALTER TABLE ONLY public.likes
 
 
 --
+-- Name: users new_users_email_key; Type: CONSTRAINT; Schema: public; Owner: asdresher
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT new_users_email_key UNIQUE (email);
+
+
+--
+-- Name: users new_users_pkey; Type: CONSTRAINT; Schema: public; Owner: asdresher
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT new_users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users new_users_username_key; Type: CONSTRAINT; Schema: public; Owner: asdresher
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT new_users_username_key UNIQUE (username);
+
+
+--
 -- Name: posts posts_pkey; Type: CONSTRAINT; Schema: public; Owner: asdresher
 --
 
@@ -376,26 +452,26 @@ ALTER TABLE ONLY public.posts
 
 
 --
--- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: asdresher
+-- Name: old_users users_email_key; Type: CONSTRAINT; Schema: public; Owner: asdresher
 --
 
-ALTER TABLE ONLY public.users
+ALTER TABLE ONLY public.old_users
     ADD CONSTRAINT users_email_key UNIQUE (email);
 
 
 --
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: asdresher
+-- Name: old_users users_pkey; Type: CONSTRAINT; Schema: public; Owner: asdresher
 --
 
-ALTER TABLE ONLY public.users
+ALTER TABLE ONLY public.old_users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
 
 --
--- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: asdresher
+-- Name: old_users users_username_key; Type: CONSTRAINT; Schema: public; Owner: asdresher
 --
 
-ALTER TABLE ONLY public.users
+ALTER TABLE ONLY public.old_users
     ADD CONSTRAINT users_username_key UNIQUE (username);
 
 
