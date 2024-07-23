@@ -1,4 +1,4 @@
-require_relative 'app'
+require_relative 'raok'
 
 run Sinatra::Application
 
