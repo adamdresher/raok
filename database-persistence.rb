@@ -5,9 +5,9 @@ class DatabasePersistence
     if Sinatra::Base.production?
       @db = PG.connect(ENV["DATABASE_URL"])
     elsif Sinatra::Base.test?
-      @db = PG.connect('raok_db_test')
+      @db = PG.connect(dbname: 'raok_db_test')
     else
-      @db = PG.connect('raok_db')
+      @db = PG.connect(dbname: 'raok_db')
     end
     @logger = logger
   end
