@@ -112,6 +112,7 @@ article.post .content {
   height: 10rem;
   width: 10rem;
   align-content: center;
+  overflow: hidden;;
 }
 
 /* metadata container */
