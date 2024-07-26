@@ -5,9 +5,9 @@ require 'pg'
 require 'pry'
 require 'pry-byebug'
 
-require_relative 'database-persistence'
-require_relative 'storage'
-require_relative 'user'
+require_relative 'lib/database-connection'
+require_relative 'lib/storage'
+require_relative 'lib/user'
 
 configure do
   enable :sessions
@@ -19,9 +19,9 @@ end
 
 configure(:development) do
   require 'sinatra/reloader'
-  also_reload 'database_persistance.rb'
-  also_reload 'storage.rb'
-  also_reload 'user.rb'
+  also_reload 'lib/database-connection.rb'
+  also_reload 'lib/storage.rb'
+  also_reload 'lib/user.rb'
 end
 
 before do

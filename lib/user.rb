@@ -1,4 +1,4 @@
-require_relative '/lib/metadata-processor'
+require_relative 'metadata_processor'
 
 class User
   include MetadataProcessor
