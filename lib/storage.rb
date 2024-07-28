@@ -1,4 +1,4 @@
-require_relative 'metadata_processor'
+require_relative 'metadata-processor'
 
 class Storage
   include MetadataProcessor

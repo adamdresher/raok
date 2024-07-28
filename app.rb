@@ -26,7 +26,7 @@ end
 
 before do
   user_id = session[:current_user]
-  @db = DatabasePersistence.new(logger)
+  @db = DatabaseConnection.new(logger)
   @storage = Storage.new(@db)
   @user = User.new(user_id, @db) if signed_in?
 end
