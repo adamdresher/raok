@@ -5,8 +5,8 @@ class User
 
   def initialize(user_id, db)
     @db = db
-    @profile = self.class.profile(user_id, db)
 
+    @profile = find_profile(user_id, db)
     @id = @profile['id']
     @username = @profile['username']
     @name = @profile['name']
@@ -14,17 +14,6 @@ class User
   end
 
   attr_reader :profile, :id, :username, :name, :email
-
-  def self.id(username, db)
-    sql = <<~QUERY
-      SELECT id, name, email, username FROM users
-       WHERE username = $1;
-    QUERY
-
-    result = db.query(username, sql)
-
-    result.first['id']
-  end
 
   def update_profile!(old_name, old_email, new_name, new_email)
     sql = <<~QUERY
@@ -35,7 +24,7 @@ class User
     QUERY
 
     @db.query(new_name, new_email, old_name, old_email, sql)
-    @profile = self.class.profile(@id, @db)
+    @profile = find_profile(@id, @db)
   end
 
   def posts
@@ -117,7 +106,7 @@ class User
 
   private
 
-  def self.profile(user_id, db)
+  def find_profile(user_id, db)
     sql = <<~QUERY
       SELECT id, name, email, username FROM users
        WHERE id = $1;

@@ -141,7 +141,7 @@ post '/signin' do
   password = params[:password]
 
   if valid_credentials?(username, password)
-    user_id = User.id(username, @db)
+    user_id = @storage.find_user_id(username)
     @user = User.new(user_id, @db)
 
     session[:current_user] = user_id

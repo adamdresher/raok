@@ -16,6 +16,17 @@ class Storage
     users.include?(username)
   end
 
+  def find_user_id(username)
+    sql = <<~QUERY
+      SELECT id FROM users
+       WHERE username = $1;
+    QUERY
+
+    result = @db.query(username, sql)
+
+    result.first['id']
+  end
+
   def add_user!(user_data)
     sql = <<~QUERY
       INSERT INTO users
