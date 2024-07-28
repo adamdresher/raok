@@ -1,16 +1,13 @@
 require_relative 'metadata-processor'
+require_relative 'database-connection'
 
-class Storage
+class Storage < DatabaseConnection
   include MetadataProcessor
-
-  def initialize(db)
-    @db = db
-  end
 
   def user_exists?(username)
     sql = "SELECT username FROM users;"
 
-    result = @db.query(sql)
+    result = query(sql)
     users = result.values.flatten
 
     users.include?(username)
@@ -22,7 +19,7 @@ class Storage
        WHERE username = $1;
     QUERY
 
-    result = @db.query(username, sql)
+    result = query(username, sql)
 
     result.first['id']
   end
@@ -34,7 +31,7 @@ class Storage
       VALUES ($1, $2, $3, $4)
     QUERY
 
-    @db.query(*user_data, sql)
+    query(*user_data, sql)
   end
 
   def delete_user!(user)
@@ -43,7 +40,7 @@ class Storage
             WHERE id = $1;
     QUERY
 
-    @db.query(user.id, sql)
+    query(user.id, sql)
   end
 
   def encrypted_password_for(username)
@@ -52,7 +49,7 @@ class Storage
        WHERE username = $1;
     QUERY
 
-    result = @db.query(username, sql)
+    result = query(username, sql)
 
     result.values.flatten.first
   end
@@ -82,7 +79,7 @@ class Storage
       ORDER BY p.id;
     QUERY
 
-    result = @db.query(sql)
+    result = query(sql)
     merge_metadata(result)
   end
 
@@ -111,7 +108,7 @@ class Storage
          WHERE p.id = $1;
     QUERY
 
-    result = @db.query(id, sql)
+    result = query(id, sql)
     merge_metadata(result)[id]
   end
 end

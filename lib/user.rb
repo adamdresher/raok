@@ -1,12 +1,15 @@
 require_relative 'metadata-processor'
+require_relative 'database-connection'
 
-class User
+class User < DatabaseConnection
   include MetadataProcessor
 
-  def initialize(user_id, db)
-    @db = db
+  # def initialize(user_id, db)
+  #   @db = db
+  def initialize(user_id: nil, logger: nil)
+    super
 
-    @profile = find_profile(user_id, db)
+    @profile = find_profile(user_id)
     @id = @profile['id']
     @username = @profile['username']
     @name = @profile['name']
@@ -23,8 +26,8 @@ class User
        WHERE name = $3 AND email = $4;
     QUERY
 
-    @db.query(new_name, new_email, old_name, old_email, sql)
-    @profile = find_profile(@id, @db)
+    query(new_name, new_email, old_name, old_email, sql)
+    @profile = find_profile(@id)
   end
 
   def posts
@@ -53,18 +56,18 @@ class User
       ORDER BY p.id;
     QUERY
 
-    result = @db.query(self.username, sql)
+    result = query(self.username, sql)
     merge_metadata(result)
   end
 
-  def add_post!(username, description)
+  def add_post!(username, description) # is username needed?
     sql = <<~QUERY
       INSERT INTO posts
                   (user_id, description)
            VALUES ($1, $2);
     QUERY
 
-    @db.query(@id, description, sql)
+    query(@id, description, sql) # should id reader be used instead of the instance variable?
   end
 
   def delete_post!(post_id)
@@ -73,7 +76,7 @@ class User
             WHERE id = $1;
     QUERY
 
-    @db.query(post_id, sql)
+    query(post_id, sql)
   end
 
   def toggle_like!(post_id)
@@ -91,7 +94,7 @@ class User
     sql = (like_state ? unlike_sql : like_sql)
     user_id = id
 
-    @db.query(post_id, user_id, sql)
+    query(post_id, user_id, sql)
   end
 
   def add_comment!(post_id, comment)
@@ -101,18 +104,18 @@ class User
            VALUES ($1, $2, $3);
     QUERY
 
-    @db.query(post_id, @id, comment, sql)
+    query(post_id, @id, comment, sql)
   end
 
   private
 
-  def find_profile(user_id, db)
+  def find_profile(user_id)
     sql = <<~QUERY
       SELECT id, name, email, username FROM users
        WHERE id = $1;
     QUERY
 
-    result = db.query(user_id, sql)
+    result = query(user_id, sql)
 
     result.first
   end
@@ -149,7 +152,7 @@ class User
       ORDER BY p.id;
     QUERY
 
-    result = @db.query(sql)
+    result = query(sql)
     merge_metadata(result)
   end
 end

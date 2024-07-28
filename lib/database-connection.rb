@@ -1,7 +1,7 @@
 require 'pg'
 
 class DatabaseConnection
-  def initialize(logger)
+  def initialize(user_id: nil, logger: nil) # user_id should not be referenced here
     if Sinatra::Base.production?
       @db = PG.connect(ENV["DATABASE_URL"])
     elsif Sinatra::Base.test?
@@ -19,6 +19,12 @@ class DatabaseConnection
   def query(*params, sql)
     @logger.info "#{sql}: #{params}"
     @db.exec_params(sql, params)
+  end
+
+  def delete_all_data
+    sql = "DELETE FROM users;"
+
+    @db.query(sql)
   end
 end
 

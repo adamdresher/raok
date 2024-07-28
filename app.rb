@@ -26,13 +26,13 @@ end
 
 before do
   user_id = session[:current_user]
-  @db = DatabaseConnection.new(logger)
-  @storage = Storage.new(@db)
-  @user = User.new(user_id, @db) if signed_in?
+  @storage = Storage.new(logger: logger)
+  @user = User.new(user_id: user_id, logger: logger) if signed_in?
 end
 
 after do
-  @db.disconnect
+  @storage.disconnect
+  @user.disconnect if signed_in?
 end
 
 # Route helper methods
@@ -142,7 +142,7 @@ post '/signin' do
 
   if valid_credentials?(username, password)
     user_id = @storage.find_user_id(username)
-    @user = User.new(user_id, @db)
+    @user = User.new(user_id: user_id, logger: logger)
 
     session[:current_user] = user_id
     session[:message] = "#{username} is signed in!"
@@ -201,7 +201,7 @@ end
 get '/user/:user_id' do
   return_home_unless_signed_in
 
-  user = User.new(params[:user_id], @db)
+  user = User.new(user_id: params[:user_id], logger: logger)
   @username = user.username
   @profile = user.profile
   @posts = user.posts
