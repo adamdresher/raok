@@ -4,10 +4,8 @@ require_relative 'database-connection'
 class User < DatabaseConnection
   include MetadataProcessor
 
-  # def initialize(user_id, db)
-  #   @db = db
   def initialize(user_id: nil, logger: nil)
-    super
+    super(logger: logger)
 
     @profile = find_profile(user_id)
     @id = @profile['id']

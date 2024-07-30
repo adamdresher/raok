@@ -1,7 +1,7 @@
 require 'pg'
 
 class DatabaseConnection
-  def initialize(user_id: nil, logger: nil) # user_id should not be referenced here
+  def initialize(logger: nil)
     if Sinatra::Base.production?
       @db = PG.connect(ENV["DATABASE_URL"])
     elsif Sinatra::Base.test?
