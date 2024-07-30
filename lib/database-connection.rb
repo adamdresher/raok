@@ -1,15 +1,16 @@
 require 'pg'
 
+# Connection to PostgreSQL database
 class DatabaseConnection
   def initialize(logger: nil)
-    if Sinatra::Base.production?
-      @db = PG.connect(ENV["DATABASE_URL"])
-    elsif Sinatra::Base.test?
-      @db = PG.connect(dbname: 'raok_db_test')
-    else
-      @db = PG.connect(dbname: 'raok_db')
-    end
     @logger = logger
+    @db = if Sinatra::Base.production?
+            PG.connect(ENV['DATABASE_URL'])
+          elsif Sinatra::Base.test?
+            PG.connect(dbname: 'raok_db_test')
+          else
+            PG.connect(dbname: 'raok_db')
+          end
   end
 
   def disconnect
@@ -22,9 +23,8 @@ class DatabaseConnection
   end
 
   def delete_all_data
-    sql = "DELETE FROM users;"
+    sql = 'DELETE FROM users;'
 
     @db.query(sql)
   end
 end
-

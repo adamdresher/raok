@@ -41,19 +41,19 @@ def signed_in?
 end
 
 def return_home_if_signed_in
-  if signed_in?
-    session[:message] = "Please sign out first"
+  return unless signed_in?
 
-    redirect '/'
-  end
+  session[:message] = 'Please sign out first'
+
+  redirect '/'
 end
 
 def return_home_unless_signed_in
-  if !signed_in?
-    session[:message] = "Please sign in first"
+  return if signed_in?
 
-    redirect '/'
-  end
+  session[:message] = 'Please sign in first'
+
+  redirect '/'
 end
 
 def valid_credentials?(username, password)
@@ -75,14 +75,19 @@ def user_profile(params)
 end
 
 helpers do
-  def format_likes_from(users, current_user)
-    if users && current_user && users.include?(current_user.username)
-      users.delete(current_user)
-      current_user = 'you'
-      users.prepend(current_user)
-    end
-    count = users.class == Array ? users.size : 0
+  def list_likes_from(users, current_user)
+    users.prepend('you').delete(current_user) if list_contains_user?(users, current_user)
 
+    count = users.class.instance_of?(Array) ? users.size : 0
+
+    format_likes_from(users, count)
+  end
+
+  def list_contains_user?(users, current_user)
+    users && current_user && users.include?(current_user.username)
+  end
+
+  def format_likes_from(users, count)
     case count
     when 0   then 'No likes yet, be the first!'
     when 1   then "Liked by #{users.first}"
@@ -99,7 +104,6 @@ end
 
 # Routes
 get '/' do
-
   settings.last_route = '/'
   @posts = @storage.all_posts
 
@@ -149,7 +153,7 @@ post '/signin' do
 
     redirect '/'
   else
-    session[:message] = "Invalid credentials"
+    session[:message] = 'Invalid credentials'
 
     redirect '/signin'
   end
@@ -220,11 +224,11 @@ get '/kindness/new' do
 end
 
 post '/kindness/new' do
-  session[:message] = "Your post has been created"
+  session[:message] = 'Your post has been created'
   username = @user.username
   description = params[:description]
 
-  @user.add_post!(username, description)
+  @user.add_post!(description)
 
   case settings.last_route
   when '/'
@@ -239,16 +243,15 @@ get '/kindness/:post_id' do
 
   settings.last_route = "/kindness/#{id}"
   @post = @storage.post(id)
-  @user_created_post = (@user && @user.username == @post['posted_by'])
-  if @post['comments'] && !signed_in?
-    @first_comment = @post['comments'].shift.last
-  end
+  @user_created_post = @user&.username == @post['posted_by']
+
+  @first_comment = @post['comments'].shift.last if @post['comments'] && !signed_in?
 
   erb :post, layout: :layout
 end
 
 post '/kindness/:post_id/delete' do
-  session[:message] = "Your post has been deleted"
+  session[:message] = 'Your post has been deleted'
   id = params[:post_id].to_i
 
   @user.delete_post!(id)

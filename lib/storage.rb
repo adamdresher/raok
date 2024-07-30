@@ -1,11 +1,12 @@
 require_relative 'metadata-processor'
 require_relative 'database-connection'
 
+# Account management and public data interface
 class Storage < DatabaseConnection
   include MetadataProcessor
 
   def user_exists?(username)
-    sql = "SELECT username FROM users;"
+    sql = 'SELECT username FROM users;'
 
     result = query(sql)
     users = result.values.flatten
@@ -56,27 +57,27 @@ class Storage < DatabaseConnection
 
   def all_posts
     sql = <<~QUERY
-        SELECT p.id AS post_id,
-               u.username AS posted_by,
-               u.id AS user_id,
-               p.description AS description,
-               l_user.username AS liked_by,
-               c.id AS comment_id,
-               c_user.id AS comment_user_id,
-               c_user.username AS commented_by,
-               c.description AS comment
-          FROM posts AS p
-          JOIN users AS u
-            ON u.id = p.user_id
-     LEFT JOIN likes AS l
-            ON p.id = l.post_id
-     LEFT JOIN users AS l_user
-            ON l.user_id = l_user.id
-     LEFT JOIN comments AS c
-            ON p.id = c.post_id
-     LEFT JOIN users AS c_user
-            ON c.user_id = c_user.id
-      ORDER BY p.id;
+      SELECT p.id AS post_id,
+             u.username AS posted_by,
+             u.id AS user_id,
+             p.description AS description,
+             l_user.username AS liked_by,
+             c.id AS comment_id,
+             c_user.id AS comment_user_id,
+             c_user.username AS commented_by,
+             c.description AS comment
+        FROM posts AS p
+        JOIN users AS u
+          ON u.id = p.user_id
+   LEFT JOIN likes AS l
+          ON p.id = l.post_id
+   LEFT JOIN users AS l_user
+          ON l.user_id = l_user.id
+   LEFT JOIN comments AS c
+          ON p.id = c.post_id
+   LEFT JOIN users AS c_user
+          ON c.user_id = c_user.id
+    ORDER BY p.id;
     QUERY
 
     result = query(sql)
@@ -85,31 +86,30 @@ class Storage < DatabaseConnection
 
   def post(id)
     sql = <<~QUERY
-        SELECT p.id AS post_id,
-               u.username AS posted_by,
-               u.id AS user_id,
-               p.description AS description,
-               l_user.username AS liked_by,
-               c.id AS comment_id,
-               c_user.id AS comment_user_id,
-               c_user.username AS commented_by,
-               c.description AS comment
-          FROM posts AS p
-          JOIN users AS u
-            ON u.id = p.user_id
-     LEFT JOIN likes AS l
-            ON p.id = l.post_id
-     LEFT JOIN users AS l_user
-            ON l.user_id = l_user.id
-     LEFT JOIN comments AS c
-            ON p.id = c.post_id
-     LEFT JOIN users AS c_user
-            ON c.user_id = c_user.id
-         WHERE p.id = $1;
+      SELECT p.id AS post_id,
+             u.username AS posted_by,
+             u.id AS user_id,
+             p.description AS description,
+             l_user.username AS liked_by,
+             c.id AS comment_id,
+             c_user.id AS comment_user_id,
+             c_user.username AS commented_by,
+             c.description AS comment
+        FROM posts AS p
+        JOIN users AS u
+          ON u.id = p.user_id
+   LEFT JOIN likes AS l
+          ON p.id = l.post_id
+   LEFT JOIN users AS l_user
+          ON l.user_id = l_user.id
+   LEFT JOIN comments AS c
+          ON p.id = c.post_id
+   LEFT JOIN users AS c_user
+          ON c.user_id = c_user.id
+       WHERE p.id = $1;
     QUERY
 
     result = query(id, sql)
     merge_metadata(result)[id]
   end
 end
-
