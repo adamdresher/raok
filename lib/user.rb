@@ -18,6 +18,10 @@ class User < DatabaseConnection
 
   attr_reader :profile, :id, :username, :name, :email
 
+  def public_profile
+    @profile.reject { |k, v| ['id', 'username'].include? k }
+  end
+
   def update_profile!(old_name, old_email, new_name, new_email)
     sql = <<~QUERY
       UPDATE users

@@ -169,8 +169,7 @@ get '/user/edit' do
   return_home_unless_signed_in
 
   @username = @user.username
-  @profile = @user.profile
-  @profile.reject! { |k, v| ['id', 'username'].include? k }
+  @profile = @user.public_profile
 
   erb :edit_profile, layout: :layout
 end
