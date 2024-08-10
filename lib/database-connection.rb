@@ -18,7 +18,7 @@ class DatabaseConnection
   end
 
   def query(*params, sql)
-    @logger.info "#{sql}: #{params}"
+    @logger.info "#{sql}: #{params}" if @logger
     @db.exec_params(sql, params)
   end
 
@@ -26,5 +26,13 @@ class DatabaseConnection
     sql = 'DELETE FROM users;'
 
     @db.query(sql)
+
+    sequences = ['users_id_seq', 'posts_id_seq', 'likes_id_seq', 'comments_id_seq',
+                 'favorites_id_seq', 'hashtags_id_seq', 'hashtag_list_id_seq']
+
+    sequences.each do |sequence|
+      sql = "ALTER SEQUENCE #{sequence} RESTART;"
+      @db.exec(sql)
+    end
   end
 end
