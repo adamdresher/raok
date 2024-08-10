@@ -66,16 +66,23 @@ def valid_signin_credentials?(username, password)
 end
 
 def valid_signup_credentials?(user_data)
-  valid_password = user_data['password1'] == user_data['password2']
+  valid_password_input = user_data['password1'] == user_data['password2']
+  # must contain a lowercase letter, uppercase letter, and a number
+  valid_password_pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/
 
-  valid_password &&
+  valid_password_input &&
+    user_data['password1'].match?(valid_password_pattern) &&
     !@storage.includes_username?(user_data['username']) &&
     !@storage.includes_email?(user_data['email'])
 end
 
 def invalid_signup_message(user_data)
+  valid_password_pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/
+
   if user_data['password1'] != user_data['password2']
     'Password unaccepted, repeat the same password twice'
+  elsif !user_data['password1'].match?(valid_password_pattern)
+    'Password must be 6 or more characters, including uppercase and lowercase letters and a number'
   elsif @storage.includes_username?(user_data['username'])
     'Username is already taken, choose a new username'
   elsif @storage.includes_email?(user_data['email'])
