@@ -314,13 +314,6 @@ ALTER TABLE ONLY public.likes ALTER COLUMN id SET DEFAULT nextval('public.likes_
 
 
 --
--- Name: old_users id; Type: DEFAULT; Schema: public; Owner: asdresher
---
-
-ALTER TABLE ONLY public.old_users ALTER COLUMN id SET DEFAULT nextval('public.old_users_id_seq'::regclass);
-
-
---
 -- Name: posts id; Type: DEFAULT; Schema: public; Owner: asdresher
 --
 
@@ -404,30 +397,6 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.posts
     ADD CONSTRAINT posts_pkey PRIMARY KEY (id);
-
-
---
--- Name: old_users users_email_key; Type: CONSTRAINT; Schema: public; Owner: asdresher
---
-
-ALTER TABLE ONLY public.old_users
-    ADD CONSTRAINT users_email_key UNIQUE (email);
-
-
---
--- Name: old_users users_pkey; Type: CONSTRAINT; Schema: public; Owner: asdresher
---
-
-ALTER TABLE ONLY public.old_users
-    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-
-
---
--- Name: old_users users_username_key; Type: CONSTRAINT; Schema: public; Owner: asdresher
---
-
-ALTER TABLE ONLY public.old_users
-    ADD CONSTRAINT users_username_key UNIQUE (username);
 
 
 --
