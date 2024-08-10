@@ -56,13 +56,31 @@ def return_home_unless_signed_in
   redirect '/'
 end
 
-def valid_credentials?(username, password)
+def valid_signin_credentials?(username, password)
   return false unless @storage.user_exists?(username)
 
   encrypted_password = @storage.encrypted_password_for(username)
   decrypted_password = BCrypt::Password.new(encrypted_password)
 
   decrypted_password == password
+end
+
+def valid_signup_credentials?(user_data)
+  valid_password = user_data['password1'] == user_data['password2']
+
+  valid_password &&
+    !@storage.includes_username?(user_data['username']) &&
+    !@storage.includes_email?(user_data['email'])
+end
+
+def invalid_signup_message(user_data)
+  if user_data['password1'] != user_data['password2']
+    'Password unaccepted, repeat the same password twice'
+  elsif @storage.includes_username?(user_data['username'])
+    'Username is already taken, choose a new username'
+  elsif @storage.includes_email?(user_data['email'])
+    'Email address is already registered'
+  end
 end
 
 def user_profile(params)
@@ -117,20 +135,16 @@ get '/signup' do
 end
 
 post '/signup' do
-  password1 = params[:password1]
-  password2 = params[:password2]
-
-  if password1 != password2
-    session[:message] = 'Invalid credentials'
-
-    redirect '/signup'
-  else
-    session[:message] = "Congrats #{params[:name]}, your account was created"
-
+  if valid_signup_credentials?(params)
     user_data = user_profile(params)
     @storage.add_user!(user_data)
-
+  
+    session[:message] = "Congrats #{params[:name]}, your account was created"
     redirect '/'
+  else
+    session[:message] = invalid_signup_message(params)
+  
+    redirect '/signup'
   end
 end
 
@@ -144,7 +158,7 @@ post '/signin' do
   username = params[:username]
   password = params[:password]
 
-  if valid_credentials?(username, password)
+  if valid_signin_credentials?(username, password)
     user_id = @storage.find_user_id(username)
     @user = User.new(user_id: user_id, logger: logger)
 

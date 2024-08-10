@@ -5,6 +5,7 @@ require_relative 'database-connection'
 class Storage < DatabaseConnection
   include MetadataProcessor
 
+  # Reading storage
   def user_exists?(username)
     sql = 'SELECT username FROM users;'
 
@@ -12,6 +13,17 @@ class Storage < DatabaseConnection
     users = result.values.flatten
 
     users.include?(username)
+  end
+
+  alias includes_username? user_exists?
+
+  def includes_email?(email)
+    sql = 'SELECT email FROM users;'
+
+    result = query(sql)
+    users = result.values.flatten
+
+    users.include?(email)
   end
 
   def find_user_id(username)
@@ -23,25 +35,6 @@ class Storage < DatabaseConnection
     result = query(username, sql)
 
     result.first['id']
-  end
-
-  def add_user!(user_data)
-    sql = <<~QUERY
-      INSERT INTO users
-             (name, email, username, password)
-      VALUES ($1, $2, $3, $4)
-    QUERY
-
-    query(*user_data, sql)
-  end
-
-  def delete_user!(user)
-    sql = <<~QUERY
-      DELETE FROM users
-            WHERE id = $1;
-    QUERY
-
-    query(user.id, sql)
   end
 
   def encrypted_password_for(username)
@@ -111,5 +104,25 @@ class Storage < DatabaseConnection
 
     result = query(id, sql)
     merge_metadata(result)[id]
+  end
+
+  # Writing to storage
+  def add_user!(user_data)
+    sql = <<~QUERY
+      INSERT INTO users
+             (name, email, username, password)
+      VALUES ($1, $2, $3, $4)
+    QUERY
+
+    query(*user_data, sql)
+  end
+
+  def delete_user!(user)
+    sql = <<~QUERY
+      DELETE FROM users
+            WHERE id = $1;
+    QUERY
+
+    query(user.id, sql)
   end
 end
