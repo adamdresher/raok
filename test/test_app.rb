@@ -30,6 +30,12 @@ class RAOKTest < Minitest::Test
     @storage.add_user!(user_data)
   end
 
+  def signin_user(username: 'username', password: 'P4ssword', current_user: 1)
+    { "rack.session" => { username: username,
+                          password: password,
+                          current_user: current_user }}
+  end
+
   def add_user_posts
   end
 
@@ -43,6 +49,16 @@ class RAOKTest < Minitest::Test
   end
 
   # Tests
+  
+  def test_index
+    title = 'Random Acts of Kindness'
+
+    get '/'
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, title
+  end
+
   def test_signup_success
     message = '<p>Congrats name, your account was created'
 
@@ -164,18 +180,23 @@ class RAOKTest < Minitest::Test
 
   def test_can_view_profile
     create_user
+    username = 'username'
+    new_post_icon = '+'
 
-    # signin
-    # current_user = '1'
-    # request profile page (using current_user)
-    # check if profile was saved
+    get '/user/1', {}, signin_user
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, username
+    assert_includes last_response.body, new_post_icon
   end
 
   def test_can_edit_profile
- 
-    # signin
-    # current_user = '1'
-    # post updated profile data for current_user
-    # check if updated profile was saved
+    create_user
+    button = 'Delete Account'
+
+    get '/user/edit', {}, signin_user
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, button
   end
 end
