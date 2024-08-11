@@ -193,10 +193,18 @@ class RAOKTest < Minitest::Test
   def test_can_edit_profile
     create_user
     button = 'Delete Account'
+    updated_user_profile = { name: 'new name', email: 'new-email@test.com' }
 
     get '/user/edit', {}, signin_user
 
     assert_equal 200, last_response.status
     assert_includes last_response.body, button
+
+    post '/user/edit', updated_user_profile
+    # get last_response["Location"] # this isn't necessary, but not sure why
+
+    assert_equal 302, last_response.status
+    get '/user/edit'
+    assert_includes last_response.body, 'new name'
   end
 end
