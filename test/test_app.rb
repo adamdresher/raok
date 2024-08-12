@@ -1,3 +1,6 @@
+require 'simplecov'
+SimpleCov.start
+
 ENV['RACK_ENV'] = 'test'
 
 require 'minitest/autorun'
@@ -207,5 +210,57 @@ class RAOKTest < Minitest::Test
     assert_equal 302, last_response.status
     get '/user/edit'
     assert_includes last_response.body, 'new name'
+  end
+
+  def test_delete_user
+    create_user
+    message = "username has been deleted"
+
+    post 'user/delete', {}, signin_user
+    assert_equal 302, last_response.status
+    get last_response["Location"]
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, message
+  end
+
+  def test_add_post
+    create_user
+    message = "Describe your"
+    post_description = "post description"
+
+    get '/kindness/new', {}, signin_user
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, message
+
+    post 'kindness/new/', { description: post_description }
+    # get last_response["Location"]
+
+    # assert_equal 302, last_response.status
+    # assert_includes last_response.body, post_description
+  end
+
+  def test_view_post
+    skip
+  end
+
+  def test_delete_post
+    skip
+  end
+
+  def test_view_other_user_profile
+    skip
+
+    # click on post's username
+    # click on comment's username
+  end
+
+  def test_like_post
+    skip
+  end
+
+  def test_comment_on_post
+    skip
   end
 end
