@@ -16,10 +16,11 @@ class RAOKTest < Minitest::Test
   def session
     last_request.env['rack.session']
   end
-
-  def admin_user
-    session[:current_user] = 1 # this requires an 'admin' user in the database
-  end
+ 
+  # unused method
+  # def first_user_session
+  #   session[:current_user] = 1 # this requires an 'admin' user in the database
+  # end
 
   def create_user(name: 'name', email: 'email@test.com', username: 'username', password: 'P4ssword')
     user_data = [name,
@@ -164,7 +165,7 @@ class RAOKTest < Minitest::Test
     message = '<p>Invalid credentials'
 
     # username isn't found
-    post '/signin', { username: 'fake-name', password: 'P4ssword' }
+    post '/signin', { username: 'invalid-username', password: 'P4ssword' }
 
     assert_equal 302, last_response.status
     get last_response["Location"]
@@ -172,7 +173,7 @@ class RAOKTest < Minitest::Test
     assert_includes last_response.body, message
 
     # wrong password
-    post '/signin', { username: 'admin', password: 'password' }
+    post '/signin', { username: 'username', password: 'password' }
     get last_response["Location"]
 
     assert_includes last_response.body, message
