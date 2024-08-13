@@ -34,13 +34,13 @@ class RAOKTest < Minitest::Test
     @storage.add_user!(user_data)
   end
 
-  def signin_user(username: 'username', password: 'P4ssword', current_user: 1)
-    { "rack.session" => { username: username,
-                          password: password,
-                          current_user: current_user }}
+  def signin_user(current_user: 1)
+    { "rack.session" => { current_user: current_user } }
   end
 
-  def add_user_posts
+  def create_post(user_id: 1, description: 'post description')
+    user = User.new(user_id: user_id)
+    user.add_post!(description)
   end
 
   def setup
@@ -55,17 +55,13 @@ class RAOKTest < Minitest::Test
   # Tests
   
   def test_index
-    title = 'Random Acts of Kindness'
-
     get '/'
 
     assert_equal 200, last_response.status
-    assert_includes last_response.body, title
+    assert_includes last_response.body, '<h1>Random Acts of Kindness'
   end
 
   def test_signup_success
-    message = '<p>Congrats name, your account was created'
-
     post '/signup', { name: 'name',
                       email: 'email@test.com',
                       username: 'username',
@@ -75,12 +71,10 @@ class RAOKTest < Minitest::Test
     assert_equal 302, last_response.status
     get last_response["Location"] # redirects for 302 status code
 
-    assert_includes last_response.body, message
+    assert_includes last_response.body, '<p>Congrats name, your account was created'
   end
 
   def test_signup_fail_passwords_dont_match
-    message = '<p>Password unaccepted, repeat the same password twice'
-
     post '/signup', { name: 'name',
                       email: 'email@test.com',
                       username: 'username',
@@ -88,9 +82,9 @@ class RAOKTest < Minitest::Test
                       password2: 'different password' }
 
     assert_equal 302, last_response.status
-    get last_response["Location"] # redirects for 302 status code
+    get last_response["Location"]
 
-    assert_includes last_response.body, message
+    assert_includes last_response.body, '<p>Password unaccepted, repeat the same password twice'
   end
 
   def test_signup_fail_invalid_password
@@ -112,6 +106,8 @@ class RAOKTest < Minitest::Test
                       username: 'username',
                       password1: 'Password',
                       password2: 'Password' }
+
+    assert_equal 302, last_response.status
     get last_response["Location"]
 
     assert_includes last_response.body, message
@@ -119,7 +115,6 @@ class RAOKTest < Minitest::Test
 
   def test_signup_fail_user_exists
     create_user
-    message = '<p>Username is already taken, choose a new username'
 
     post '/signup', { name: 'name',
                       email: 'new_email@test.com',
@@ -128,14 +123,13 @@ class RAOKTest < Minitest::Test
                       password2: 'P4ssword' }
 
     assert_equal 302, last_response.status
-    get last_response["Location"] # redirects for 302 status code
+    get last_response["Location"]
 
-    assert_includes last_response.body, message
+    assert_includes last_response.body, '<p>Username is already taken, choose a new username'
   end
 
   def test_signup_fail_email_exists
     create_user
-    message = '<p>Email address is already registered'
 
     post '/signup', { name: 'name',
                       email: 'email@test.com',
@@ -146,26 +140,24 @@ class RAOKTest < Minitest::Test
     assert_equal 302, last_response.status
     get last_response["Location"]
 
-    assert_includes last_response.body, message
+    assert_includes last_response.body, '<p>Email address is already registered'
   end
 
   def test_signin_success
     create_user
-    current_user = '1'
-    message = '<p>username is signed in!'
 
     post '/signin', { username: 'username', password: 'P4ssword' }
 
     assert_equal 302, last_response.status
     get last_response["Location"]
 
-    assert_equal session[:current_user], current_user
-    assert_includes last_response.body, message
+    assert_equal session[:current_user], '1'
+    assert_includes last_response.body, '<p>username is signed in!'
   end
 
   def test_signin_fail_invalid_credentials
     create_user
-    message = '<p>Invalid credentials'
+    flash_message = '<p>Invalid credentials'
 
     # username isn't found
     post '/signin', { username: 'invalid-username', password: 'P4ssword' }
@@ -173,94 +165,175 @@ class RAOKTest < Minitest::Test
     assert_equal 302, last_response.status
     get last_response["Location"]
 
-    assert_includes last_response.body, message
+    assert_includes last_response.body, flash_message
 
     # wrong password
     post '/signin', { username: 'username', password: 'password' }
+
+    assert_equal 302, last_response.status
     get last_response["Location"]
 
-    assert_includes last_response.body, message
+    assert_includes last_response.body, flash_message
   end
 
   def test_can_view_profile
     create_user
-    username = 'username'
-    new_post_icon = '+'
 
     get '/user/1', {}, signin_user
 
     assert_equal 200, last_response.status
-    assert_includes last_response.body, username
-    assert_includes last_response.body, new_post_icon
+    assert_includes last_response.body, '<h2>username'
+    assert_includes last_response.body, '<p><b>+'
   end
 
   def test_can_edit_profile
     create_user
-    button = 'Delete Account'
     updated_user_profile = { name: 'new name', email: 'new-email@test.com' }
 
     get '/user/edit', {}, signin_user
 
     assert_equal 200, last_response.status
-    assert_includes last_response.body, button
+    assert_includes last_response.body, '="submit">Delete Account'
 
     post '/user/edit', updated_user_profile
-    # get last_response["Location"] # this isn't necessary, but not sure why
 
     assert_equal 302, last_response.status
-    get '/user/edit'
-    assert_includes last_response.body, 'new name'
+    get last_response["Location"]
+
+    assert_includes last_response.body, "<p>username's profile has been updated"
   end
 
   def test_delete_user
     create_user
-    message = "username has been deleted"
 
-    post 'user/delete', {}, signin_user
+    post '/user/delete', {}, signin_user
+
     assert_equal 302, last_response.status
     get last_response["Location"]
 
+    assert_includes last_response.body, '<p>username has been deleted'
+  end
+
+  def test_view_other_user_profile
+    create_user
+    create_post
+    create_user(name: 'Mr Cat', email: 'cat@nd-friends.com', username: 'cat', password: 'lanna-music')
+
+    get '/user/1', {}, signin_user(current_user: 2)
+
     assert_equal 200, last_response.status
-    assert_includes last_response.body, message
+    assert_includes last_response.body, '<h2>username'
+    assert_includes last_response.body, '<p>post description'
   end
 
   def test_add_post
     create_user
-    message = "Describe your"
-    post_description = "post description"
+    description = 'post description'
 
     get '/kindness/new', {}, signin_user
 
     assert_equal 200, last_response.status
-    assert_includes last_response.body, message
+    assert_includes last_response.body, '="kindness">Describe your'
 
-    post 'kindness/new/', { description: post_description }
-    # get last_response["Location"]
+    post '/kindness/new', { description: description }
 
-    # assert_equal 302, last_response.status
-    # assert_includes last_response.body, post_description
+    assert_equal 302, last_response.status
+    get last_response["Location"]
+
+    assert_includes last_response.body, '<p>Your post has been created'
+    assert_includes last_response.body, description
   end
 
   def test_view_post
-    skip
+    create_user
+    create_post
+    description = 'post description'
+
+    get '/', {}, signin_user
+
+    assert_includes last_response.body, description
+
+    get '/user/1'
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, description
+
+    get '/kindness/1'
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, description
   end
 
   def test_delete_post
-    skip
-  end
+    create_user
+    create_post
 
-  def test_view_other_user_profile
-    skip
+    post '/kindness/1/delete', {}, signin_user
 
-    # click on post's username
-    # click on comment's username
+    assert_equal 302, last_response.status
+    get last_response["Location"]
+
+    assert_includes last_response.body, '<p>Your post has been deleted'
+    refute_includes last_response.body, '<p>post description'
   end
 
   def test_like_post
-    skip
+    create_user
+    create_post
+    create_user(name: 'Mr Cat', email: 'cat@nd-friends.com', username: 'cat', password: 'lanna-music')
+
+    get '/kindness/1', {}, signin_user
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'like-off.png'
+
+    post '/kindness/1/like'
+
+    assert_equal 302, last_response.status
+    get last_response["Location"]
+
+    assert_includes last_response.body, 'like-on.png'
+
+    get '/kindness/1', {}, signin_user(current_user: 2)
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, 'like-off.png'
+
+    post '/kindness/1/like'
+
+    assert_equal 302, last_response.status
+    get last_response["Location"]
+
+    assert_includes last_response.body, 'like-on.png'
+
+    post '/kindness/1/like'
+
+    assert_equal 302, last_response.status
+    get last_response["Location"]
+
+    assert_includes last_response.body, 'like-off.png'
   end
 
   def test_comment_on_post
-    skip
+    create_user
+    create_post
+    create_user(name: 'Mr Cat', email: 'cat@nd-friends.com', username: 'cat', password: 'lanna-music')
+    comment = 'a comment'
+    another_comment = 'another comment'
+
+    # the 'new' at the end of the route doesn't match the rest of my route pattern
+    post '/kindness/1/comment/new', {'new-comment' => comment }, signin_user
+
+    assert_equal 302, last_response.status
+    get last_response["Location"]
+
+    assert_includes last_response.body, comment
+
+    post '/kindness/1/comment/new', {'new-comment' => another_comment }, signin_user(current_user: 2)
+
+    assert_equal 302, last_response.status
+    get last_response["Location"]
+
+    assert_includes last_response.body, another_comment
   end
 end
