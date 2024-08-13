@@ -285,7 +285,7 @@ post '/kindness/:post_id/like' do
 
   @user.toggle_like!(post_id)
 
-  redirect settings.last_route
+  redirect "/kindness/#{post_id}"
 end
 
 post '/kindness/:post_id/comment/new' do
@@ -294,5 +294,5 @@ post '/kindness/:post_id/comment/new' do
 
   @user.add_comment!(post_id, comment)
 
-  redirect settings.last_route
+  redirect "/kindness/#{post_id}"
 end
