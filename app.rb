@@ -288,7 +288,7 @@ post '/kindness/:post_id/like' do
   redirect "/kindness/#{post_id}"
 end
 
-post '/kindness/:post_id/comment/new' do
+post '/kindness/:post_id/comment' do
   post_id = params[:post_id].to_i
   comment = params['new-comment']
 

@@ -16,14 +16,10 @@ class RAOKTest < Minitest::Test
   end
 
   # Helper methods
+
   def session
     last_request.env['rack.session']
   end
- 
-  # unused method
-  # def first_user_session
-  #   session[:current_user] = 1 # this requires an 'admin' user in the database
-  # end
 
   def create_user(name: 'name', email: 'email@test.com', username: 'username', password: 'P4ssword')
     user_data = [name,
@@ -45,7 +41,6 @@ class RAOKTest < Minitest::Test
 
   def setup
     @storage = Storage.new
-    @storage.delete_all_data
   end
 
   def teardown
@@ -321,15 +316,14 @@ class RAOKTest < Minitest::Test
     comment = 'a comment'
     another_comment = 'another comment'
 
-    # the 'new' at the end of the route doesn't match the rest of my route pattern
-    post '/kindness/1/comment/new', {'new-comment' => comment }, signin_user
+    post '/kindness/1/comment', {'new-comment' => comment }, signin_user
 
     assert_equal 302, last_response.status
     get last_response["Location"]
 
     assert_includes last_response.body, comment
 
-    post '/kindness/1/comment/new', {'new-comment' => another_comment }, signin_user(current_user: 2)
+    post '/kindness/1/comment', {'new-comment' => another_comment }, signin_user(current_user: 2)
 
     assert_equal 302, last_response.status
     get last_response["Location"]
