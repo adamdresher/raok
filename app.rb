@@ -9,6 +9,9 @@ require_relative 'lib/database-connection'
 require_relative 'lib/storage'
 require_relative 'lib/user'
 
+# must contain a lowercase letter, uppercase letter, and a number
+VALID_PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/
+
 configure do
   enable :sessions
   set :session_secret, 'WTu3&CEJn@vG@9AdxLAV833R!rYTZ^2tiejq4kWh8UEsRmDZXa&nyvdWz$#&S#wT'
@@ -36,11 +39,34 @@ after do
 end
 
 # Route helper methods
-def signed_in?
-  session[:current_user]
+
+def format_likes_from(users, count)
+  case count
+  when 0   then 'No likes yet, be the first!'
+  when 1   then "Liked by #{users.first}"
+  when 2   then "Liked by #{users.first} and #{users.last}"
+  when 3   then "Liked by #{users.first}, #{users[1]}, and one other"
+  when 4.. then "Liked by #{users.first}, #{users[1]} and #{count - 2} others"
+  end
 end
 
-def return_home_if_signed_in
+def list_contains_user?(users, current_user)
+  users && current_user && users.include?(current_user.username)
+end
+
+def invalid_signup_message(user_data)
+  if user_data['password1'] != user_data['password2']
+    'Password unaccepted, repeat the same password twice'
+  elsif !user_data['password1'].match?(VALID_PASSWORD_PATTERN)
+    'Password must be 6 or more characters, including uppercase and lowercase letters and a number'
+  elsif @storage.includes_username?(username: user_data['username'])
+    'Username is already taken, choose a new username'
+  elsif @storage.includes_email?(user_data['email'])
+    'Email address is already registered'
+  end
+end
+
+def redirect_home_if_signed_in
   return unless signed_in?
 
   session[:message] = 'Please sign out first'
@@ -48,7 +74,7 @@ def return_home_if_signed_in
   redirect '/'
 end
 
-def return_home_unless_signed_in
+def redirect_home_unless_signed_in
   return if signed_in?
 
   session[:message] = 'Please sign in first'
@@ -56,38 +82,8 @@ def return_home_unless_signed_in
   redirect '/'
 end
 
-def valid_signin_credentials?(username, password)
-  return false unless @storage.user_exists?(username)
-
-  encrypted_password = @storage.encrypted_password_for(username)
-  decrypted_password = BCrypt::Password.new(encrypted_password)
-
-  decrypted_password == password
-end
-
-def valid_signup_credentials?(user_data)
-  valid_password_input = user_data['password1'] == user_data['password2']
-  # must contain a lowercase letter, uppercase letter, and a number
-  valid_password_pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/
-
-  valid_password_input &&
-    user_data['password1'].match?(valid_password_pattern) &&
-    !@storage.includes_username?(user_data['username']) &&
-    !@storage.includes_email?(user_data['email'])
-end
-
-def invalid_signup_message(user_data)
-  valid_password_pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/
-
-  if user_data['password1'] != user_data['password2']
-    'Password unaccepted, repeat the same password twice'
-  elsif !user_data['password1'].match?(valid_password_pattern)
-    'Password must be 6 or more characters, including uppercase and lowercase letters and a number'
-  elsif @storage.includes_username?(user_data['username'])
-    'Username is already taken, choose a new username'
-  elsif @storage.includes_email?(user_data['email'])
-    'Email address is already registered'
-  end
+def signed_in?
+  session[:current_user]
 end
 
 def user_profile(params)
@@ -99,6 +95,24 @@ def user_profile(params)
   [name, email, username, password]
 end
 
+def valid_signin_credentials?(username, password)
+  return false unless @storage.user_exists?(username: username)
+
+  encrypted_password = @storage.encrypted_password_for(username)
+  decrypted_password = BCrypt::Password.new(encrypted_password)
+
+  decrypted_password == password
+end
+
+def valid_signup_credentials?(user_data)
+  valid_password_input = user_data['password1'] == user_data['password2']
+
+  valid_password_input &&
+    user_data['password1'].match?(VALID_PASSWORD_PATTERN) &&
+    !@storage.includes_username?(username: user_data['username']) &&
+    !@storage.includes_email?(user_data['email'])
+end
+
 helpers do
   def list_likes_from(users, current_user)
     users.prepend('you').delete(current_user) if list_contains_user?(users, current_user)
@@ -108,26 +122,13 @@ helpers do
     format_likes_from(users, count)
   end
 
-  def list_contains_user?(users, current_user)
-    users && current_user && users.include?(current_user.username)
-  end
-
-  def format_likes_from(users, count)
-    case count
-    when 0   then 'No likes yet, be the first!'
-    when 1   then "Liked by #{users.first}"
-    when 2   then "Liked by #{users.first} and #{users.last}"
-    when 3   then "Liked by #{users.first}, #{users[1]}, and one other"
-    when 4.. then "Liked by #{users.first}, #{users[1]} and #{count - 2} others"
-    end
-  end
-
   def user_likes?(post)
     post['liked_by'] && @user && post['liked_by'].include?(@user.username)
   end
 end
 
 # Routes
+
 get '/' do
   settings.last_route = '/'
   @posts = @storage.all_posts
@@ -136,7 +137,7 @@ get '/' do
 end
 
 get '/signup' do
-  return_home_if_signed_in
+  redirect_home_if_signed_in
 
   erb :signup, layout: :layout
 end
@@ -156,7 +157,7 @@ post '/signup' do
 end
 
 get '/signin' do
-  return_home_if_signed_in
+  redirect_home_if_signed_in
 
   erb :signin, layout: :layout
 end
@@ -190,40 +191,12 @@ post '/signout' do
   redirect '/'
 end
 
-get '/user/edit' do
-  return_home_unless_signed_in
-
-  @username = @user.username
-  @profile = @user.public_profile
-
-  erb :edit_profile, layout: :layout
-end
-
-post '/user/edit' do
-  session[:message] = "#{@user.username}'s profile has been updated"
-  old_name = @user.profile['name']
-  old_email = @user.profile['email']
-  new_name = params[:name]
-  new_email = params[:email]
-
-  @user.update_profile!(old_name, old_email, new_name, new_email)
-
-  redirect "/user/#{@user.id}"
-end
-
-post '/user/delete' do
-  session[:message] = "#{@user.username} has been deleted"
-
-  @storage.delete_user!(@user)
-  @user = nil
-
-  session.delete(:current_user)
-
-  redirect '/'
-end
-
 get '/user/:user_id' do
-  return_home_unless_signed_in
+  unless @storage.user_exists?(user_id: params[:user_id])
+    session[:message] = 'User does not exist'
+
+    redirect '/'
+  end
 
   user = User.new(user_id: params[:user_id], logger: logger)
   @username = user.username
@@ -238,8 +211,40 @@ get '/user/:user_id' do
   erb :profile, layout: :layout
 end
 
+get '/user/:user_id/edit' do
+  redirect_home_unless_signed_in
+
+  @username = @user.username
+  @profile = @user.public_profile
+
+  erb :edit_profile, layout: :layout
+end
+
+post '/user/:user_id/edit' do
+  session[:message] = "#{@user.username}'s profile has been updated"
+  old_name = @user.profile['name']
+  old_email = @user.profile['email']
+  new_name = params[:name]
+  new_email = params[:email]
+
+  @user.update_profile!(old_name, old_email, new_name, new_email)
+
+  redirect "/user/#{@user.id}"
+end
+
+post '/user/:user_id/delete' do
+  session[:message] = "#{@user.username} has been deleted"
+
+  @storage.delete_user!(@user)
+  @user = nil
+
+  session.delete(:current_user)
+
+  redirect '/'
+end
+
 get '/kindness/new' do
-  return_home_unless_signed_in
+  redirect_home_unless_signed_in
 
   erb :new_post, layout: :layout
 end
@@ -295,4 +300,15 @@ post '/kindness/:post_id/comment' do
   @user.add_comment!(post_id, comment)
 
   redirect "/kindness/#{post_id}"
+end
+
+post '/kindness/:query_type&:query' do
+  query_type = params[:query_type]
+  query = params[:query]
+
+  if query_type == username
+    # search by username
+  else
+    # search by hashtag
+  end
 end

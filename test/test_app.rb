@@ -185,12 +185,12 @@ class RAOKTest < Minitest::Test
     create_user
     updated_user_profile = { name: 'new name', email: 'new-email@test.com' }
 
-    get '/user/edit', {}, signin_user
+    get '/user/1/edit', {}, signin_user
 
     assert_equal 200, last_response.status
     assert_includes last_response.body, '="submit">Delete Account'
 
-    post '/user/edit', updated_user_profile
+    post '/user/1/edit', updated_user_profile
 
     assert_equal 302, last_response.status
     get last_response["Location"]
@@ -201,7 +201,7 @@ class RAOKTest < Minitest::Test
   def test_delete_user
     create_user
 
-    post '/user/delete', {}, signin_user
+    post '/user/1/delete', {}, signin_user
 
     assert_equal 302, last_response.status
     get last_response["Location"]
@@ -209,7 +209,18 @@ class RAOKTest < Minitest::Test
     assert_includes last_response.body, '<p>username has been deleted'
   end
 
-  def test_view_other_user_profile
+  def test_view_other_user_profile_while_signed_out
+    create_user
+    create_post
+
+    get '/user/1'
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, '<h2>username'
+    assert_includes last_response.body, '<p>post description'
+  end
+
+  def test_view_other_user_profile_while_signed_in
     create_user
     create_post
     create_user(name: 'Mr Cat', email: 'cat@nd-friends.com', username: 'cat', password: 'lanna-music')
@@ -329,5 +340,31 @@ class RAOKTest < Minitest::Test
     get last_response["Location"]
 
     assert_includes last_response.body, another_comment
+  end
+
+  def test_search_posts_by_user
+    skip
+    create_user
+    create_user(username: 'Mr Cat', email: 'cat@nd-friends', username: 'cat', password: 'lanna-music')
+    create_post
+    create_post(user_id: 2, description: 'I love Chiang Mai!')
+
+    get '/kindness/search?user=cat', {}, signin_user
+
+    assert_equal 302, last_response.status
+    assert_includes last_response.body, 'cat'
+    assert_includes last_response.body, 'I love Chiang Mai!'
+  end
+
+  def test_search_posts_by_hashtag
+    skip
+    create_user
+    create_post
+    create_post(description: "another post #new-tag")
+
+    get '/kindness/search?hashtag=new-tag', {}, signin_user
+
+    assert_equal 302, last_response.status
+    assert_includes last_response.body, 'another post'
   end
 end

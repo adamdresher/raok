@@ -6,13 +6,21 @@ class Storage < DatabaseConnection
   include MetadataProcessor
 
   # Reading storage
-  def user_exists?(username)
-    sql = 'SELECT username FROM users;'
 
-    result = query(sql)
-    users = result.values.flatten
+  def user_exists?(username: nil, user_id: nil)
+    if username
+      sql = 'SELECT username FROM users;'
+      result = query(sql)
+      users = result.values.flatten
 
-    users.include?(username)
+      users.include?(username)
+    else
+      sql = 'SELECT id FROM users;'
+      result = query(sql)
+      users = result.values.flatten
+
+      users.include?(user_id)
+    end
   end
 
   alias includes_username? user_exists?
@@ -107,6 +115,7 @@ class Storage < DatabaseConnection
   end
 
   # Writing to storage
+
   def add_user!(user_data)
     sql = <<~QUERY
       INSERT INTO users
