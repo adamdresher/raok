@@ -23,12 +23,14 @@ class DatabaseConnection
   end
 
   def delete_all_data
-    sql = 'DELETE FROM users;'
-
-    @db.query(sql)
-
+    relations = ['users', 'hashtag_list']
     sequences = ['users_id_seq', 'posts_id_seq', 'likes_id_seq', 'comments_id_seq',
                  'favorites_id_seq', 'hashtags_id_seq', 'hashtag_list_id_seq']
+
+    relations.each do |relation|
+      sql = "DELETE FROM #{relation};"
+      @db.query(sql)
+    end
 
     sequences.each do |sequence|
       sql = "ALTER SEQUENCE #{sequence} RESTART;"

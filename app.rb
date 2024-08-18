@@ -302,13 +302,20 @@ post '/kindness/:post_id/comment' do
   redirect "/kindness/#{post_id}"
 end
 
-post '/kindness/:query_type&:query' do
-  query_type = params[:query_type]
-  query = params[:query]
+get '/query/:query_type&:query' do
+  @query_type = params[:query_type]
+  @query = params[:query]
 
-  if query_type == username
-    # search by username
+  if @query_type == 'username'
+    user_ids = @storage.similar_user_ids_for(@query)
+    @users = user_ids.map { |user_id| User.new(user_id: user_id) }
+  elsif @query_type == 'hashtag'
+    @posts = @storage.find_posts_for(@query)
   else
-    # search by hashtag
+    session[:message] = 'Invalid input'
+
+    redirect '/'
   end
+
+  erb :query_results, layout: :layout
 end

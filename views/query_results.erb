@@ -1,0 +1,55 @@
+<div>
+  <h2>Search Results for the <%== @query_type %>: <em><%== @query %></em></h2>
+</div>
+
+<% if @users %>
+
+  <div>
+    <ul>
+      <% @users.each do |user| %>
+        <li>
+          <a href="/user/<%== user.id %>"><%== user.username %></a>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+<% elsif @posts %>
+
+  <div>
+    <% @posts.each_pair do |id, post| %>
+
+      <article class="post">
+        <div class="post content">
+          <p><%== post['description'] %></p>
+        </div>
+
+        <div class="post metadata">
+          <div class="line">
+            <p>Kindness by <%== post['posted_by'] %></p>
+          </div>
+
+          <div class="line">
+            <% if user_likes?(post) %>
+              <img src="/icons/like-on.png" width="12" height="12">
+            <% else %>
+              <img src="/icons/like-off.png" width="12" height="12">
+            <% end %>
+
+            <p><%== post['liked_by'] ? post['liked_by'].count : 0 %></p>
+
+            <img src="/icons/comments.png" width="12" height="12">
+
+            <p><%== post['comments'] ? post['comments'].count : 0 %></p>
+          </div>
+        </div>
+
+        <a href="/kindness/<%== id %>">
+          <span></span>
+        </a>
+      </article>
+
+    <% end %>
+  </div>
+
+<% end %>

@@ -342,29 +342,26 @@ class RAOKTest < Minitest::Test
     assert_includes last_response.body, another_comment
   end
 
-  def test_search_posts_by_user
-    skip
+  def test_search_for_user
     create_user
-    create_user(username: 'Mr Cat', email: 'cat@nd-friends', username: 'cat', password: 'lanna-music')
+    create_user(username: 'Mr Cat', email: 'cat@nd-friends.com', username: 'cat', password: 'lanna-music')
     create_post
     create_post(user_id: 2, description: 'I love Chiang Mai!')
 
-    get '/kindness/search?user=cat', {}, signin_user
+    get '/query/username&cat', {}, signin_user
 
-    assert_equal 302, last_response.status
+    assert_equal 200, last_response.status
     assert_includes last_response.body, 'cat'
-    assert_includes last_response.body, 'I love Chiang Mai!'
   end
 
-  def test_search_posts_by_hashtag
-    skip
+  def test_search_for_posts_by_hashtag
     create_user
     create_post
     create_post(description: "another post #new-tag")
 
-    get '/kindness/search?hashtag=new-tag', {}, signin_user
+    get '/query/hashtag&new-tag', {}, signin_user
 
-    assert_equal 302, last_response.status
+    assert_equal 200, last_response.status
     assert_includes last_response.body, 'another post'
   end
 end

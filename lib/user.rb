@@ -71,6 +71,8 @@ class User < DatabaseConnection
     QUERY
 
     query(id, description, sql)
+
+    add_hashtags_in_last_post
   end
 
   def delete_post!(post_id)
@@ -111,6 +113,67 @@ class User < DatabaseConnection
   end
 
   private
+
+  def add_hashtags_in_last_post
+    hashtags = hashtags_in_last_post
+    return if hashtags.empty?
+
+    hashtag_list_sql = <<~QUERY
+      INSERT INTO hashtag_list (title)
+      VALUES ($1);
+    QUERY
+
+    hashtags_sql = <<~QUERY
+      INSERT INTO hashtags (post_id, hashtag_id)
+      VALUES ($1, $2);
+    QUERY
+
+    hashtags.each do |hashtag|
+      query(hashtag, hashtag_list_sql) unless hashtag_exists?(hashtag) # add hashtag to hashtag_list
+
+      h_id = hashtag_id(hashtag)
+      post_id = last_post['id']
+
+      query(post_id, h_id, hashtags_sql) # add hashtag to hashtags
+    end
+  end
+
+  def hashtag_exists?(hashtag)
+    sql = <<~QUERY
+      SELECT id FROM hashtag_list
+       WHERE title = $1;
+    QUERY
+
+    result = query(hashtag, sql)
+    result.values.flatten.any?
+  end
+
+  def hashtag_id(hashtag)
+    sql = <<~QUERY
+      SELECT id FROM hashtag_list
+       WHERE title = $1;
+    QUERY
+
+    result = query(hashtag, sql)
+
+    result.first['id']
+  end
+
+  def last_post
+    sql = <<~QUERY
+      SELECT * FROM posts
+      ORDER BY id DESC
+      LIMIT 1;
+    QUERY
+
+    result = query(sql)
+    result.first
+  end
+
+  def hashtags_in_last_post
+    post_description = last_post['description']
+    post_description.split.select { |string| string[0] == '#' }.map { |string| string[1..] }
+  end
 
   def find_profile(user_id)
     sql = <<~QUERY
