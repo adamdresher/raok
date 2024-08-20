@@ -7,16 +7,16 @@
     </a>
   </article>
 
-  <% @posts.each_pair do |id, post| %>
+  <% @public_posts.each do |post| %>
 
     <article class="post">
       <div class="post content">
-        <p><%== post['description'] %></p>
+        <p><%== post.description %></p>
       </div>
 
       <div class="post metadata">
         <div class="line">
-          <p>Kindness by <%== post['posted_by'] %></p>
+          <p>Kindness by <%== post.posted_by %></p>
         </div>
 
         <div class="line">
@@ -26,15 +26,15 @@
             <img src="/icons/like-off.png" width="12" height="12">
           <% end %>
 
-          <p><%== post['liked_by'] ? post['liked_by'].count : 0 %></p>
+          <p><%== post.liked_by ? post.liked_by.count : 0 %></p>
 
           <img src="/icons/comments.png" width="12" height="12">
 
-          <p><%== post['comments'] ? post['comments'].count : 0 %></p>
+          <p><%== post.comments ? post.comments.count : 0 %></p>
         </div>
       </div>
 
-      <a href="/kindness/<%== id %>">
+      <a href="/kindness/<%== post.id %>">
         <span></span>
       </a>
     </article>

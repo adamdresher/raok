@@ -27,7 +27,7 @@ class RAOKTest < Minitest::Test
                  username,
                  BCrypt::Password.create(password)]
  
-    @storage.add_user!(user_data)
+    @users.add!(user_data)
   end
 
   def signin_user(current_user: 1)
@@ -36,15 +36,16 @@ class RAOKTest < Minitest::Test
 
   def create_post(user_id: 1, description: 'post description')
     user = User.new(user_id: user_id)
+
     user.add_post!(description)
   end
 
   def setup
-    @storage = Storage.new
+    @users = Users.new
   end
 
   def teardown
-    @storage.delete_all_data
+    @users.delete_all_data
   end
 
   # Tests

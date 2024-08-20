@@ -4,11 +4,11 @@
 
 <div class="form-box">
   <p>
-    <b><%== @username %></b>
+    <b><%== @user.username %></b>
   </p>
 
   <form action="/user/edit" method="post">
-    <% @profile.each do |attribute, value| %>
+    <% @user.public_profile.each do |attribute, value| %>
 
     <div class="form-box field">
       <label for="edit-profile"><%== attribute.capitalize %>:

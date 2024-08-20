@@ -2,11 +2,11 @@
   <h2>Search Results for the <%== @query_type %>: <em><%== @query %></em></h2>
 </div>
 
-<% if @users %>
+<% if @selected_users&.any? %>
 
   <div>
     <ul>
-      <% @users.each do |user| %>
+      <% @selected_users.each do |user| %>
         <li>
           <a href="/user/<%== user.id %>"><%== user.username %></a>
         </li>
@@ -14,19 +14,19 @@
     </ul>
   </div>
 
-<% elsif @posts %>
+<% elsif @selected_posts&.any? %>
 
   <div>
-    <% @posts.each_pair do |id, post| %>
+    <% @selected_posts.each do |post| %>
 
       <article class="post">
         <div class="post content">
-          <p><%== post['description'] %></p>
+          <p><%== post.description %></p>
         </div>
 
         <div class="post metadata">
           <div class="line">
-            <p>Kindness by <%== post['posted_by'] %></p>
+            <p>Kindness by <%== post.posted_by %></p>
           </div>
 
           <div class="line">
@@ -36,15 +36,15 @@
               <img src="/icons/like-off.png" width="12" height="12">
             <% end %>
 
-            <p><%== post['liked_by'] ? post['liked_by'].count : 0 %></p>
+            <p><%== post.liked_by ? post.liked_by.count : 0 %></p>
 
             <img src="/icons/comments.png" width="12" height="12">
 
-            <p><%== post['comments'] ? post['comments'].count : 0 %></p>
+            <p><%== post.comments ? post.comments.count : 0 %></p>
           </div>
         </div>
 
-        <a href="/kindness/<%== id %>">
+        <a href="/kindness/<%== post.id %>">
           <span></span>
         </a>
       </article>

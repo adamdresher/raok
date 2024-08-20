@@ -7,7 +7,9 @@ require 'pry-byebug'
 
 require_relative 'lib/database-connection'
 require_relative 'lib/storage'
+require_relative 'lib/users'
 require_relative 'lib/user'
+require_relative 'lib/posts'
 
 # must contain a lowercase letter, uppercase letter, and a number
 VALID_PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/
@@ -29,12 +31,14 @@ end
 
 before do
   user_id = session[:current_user]
-  @storage = Storage.new(logger: logger)
+  @users = Users.new(logger: logger)
+  @posts = Posts.new(logger: logger)
   @user = User.new(user_id: user_id, logger: logger) if signed_in?
 end
 
 after do
-  @storage.disconnect
+  @users.disconnect
+  @posts.disconnect
   @user.disconnect if signed_in?
 end
 
@@ -59,9 +63,9 @@ def invalid_signup_message(user_data)
     'Password unaccepted, repeat the same password twice'
   elsif !user_data['password1'].match?(VALID_PASSWORD_PATTERN)
     'Password must be 6 or more characters, including uppercase and lowercase letters and a number'
-  elsif @storage.includes_username?(username: user_data['username'])
+  elsif @users.include?(username: user_data['username'])
     'Username is already taken, choose a new username'
-  elsif @storage.includes_email?(user_data['email'])
+  elsif @users.include?(email: user_data['email'])
     'Email address is already registered'
   end
 end
@@ -96,9 +100,9 @@ def user_profile(params)
 end
 
 def valid_signin_credentials?(username, password)
-  return false unless @storage.user_exists?(username: username)
+  return false unless @users.include?(username: username)
 
-  encrypted_password = @storage.encrypted_password_for(username)
+  encrypted_password = @users.encrypted_password_for(username)
   decrypted_password = BCrypt::Password.new(encrypted_password)
 
   decrypted_password == password
@@ -109,8 +113,8 @@ def valid_signup_credentials?(user_data)
 
   valid_password_input &&
     user_data['password1'].match?(VALID_PASSWORD_PATTERN) &&
-    !@storage.includes_username?(username: user_data['username']) &&
-    !@storage.includes_email?(user_data['email'])
+    !@users.include?(username: user_data['username']) &&
+    !@users.include?(email: user_data['email'])
 end
 
 helpers do
@@ -123,7 +127,7 @@ helpers do
   end
 
   def user_likes?(post)
-    post['liked_by'] && @user && post['liked_by'].include?(@user.username)
+    post.liked_by && @user && post.liked_by.include?(@user.username)
   end
 end
 
@@ -131,7 +135,7 @@ end
 
 get '/' do
   settings.last_route = '/'
-  @posts = @storage.all_posts
+  @public_posts = @posts.all
 
   erb :index, layout: :layout
 end
@@ -145,7 +149,7 @@ end
 post '/signup' do
   if valid_signup_credentials?(params)
     user_data = user_profile(params)
-    @storage.add_user!(user_data)
+    @users.add!(user_data)
   
     session[:message] = "Congrats #{params[:name]}, your account was created"
     redirect '/'
@@ -167,7 +171,7 @@ post '/signin' do
   password = params[:password]
 
   if valid_signin_credentials?(username, password)
-    user_id = @storage.find_user_id(username)
+    user_id = @users.id_for(username)
     @user = User.new(user_id: user_id, logger: logger)
 
     session[:current_user] = user_id
@@ -192,21 +196,19 @@ post '/signout' do
 end
 
 get '/user/:user_id' do
-  unless @storage.user_exists?(user_id: params[:user_id])
+  unless @users.exists?(user_id: params[:user_id])
     session[:message] = 'User does not exist'
 
     redirect '/'
   end
 
-  user = User.new(user_id: params[:user_id], logger: logger)
-  @username = user.username
-  @profile = user.profile
-  @posts = user.posts
+  @user = User.new(user_id: params[:user_id], logger: logger)
+  @selected_posts = @posts.from_user(@user.id)
 
   # current user has access to editing target user's profile
-  @is_current_user_profile = (session[:current_user] == user.id)
+  @is_current_user_profile = (session[:current_user] == @user.id)
 
-  settings.last_route = "/user/#{params[:user_id]}"
+  settings.last_route = "/user/#{@user.id}"
 
   erb :profile, layout: :layout
 end
@@ -214,20 +216,15 @@ end
 get '/user/:user_id/edit' do
   redirect_home_unless_signed_in
 
-  @username = @user.username
-  @profile = @user.public_profile
-
   erb :edit_profile, layout: :layout
 end
 
 post '/user/:user_id/edit' do
   session[:message] = "#{@user.username}'s profile has been updated"
-  old_name = @user.profile['name']
-  old_email = @user.profile['email']
   new_name = params[:name]
   new_email = params[:email]
 
-  @user.update_profile!(old_name, old_email, new_name, new_email)
+  @user.update_profile!(new_name, new_email)
 
   redirect "/user/#{@user.id}"
 end
@@ -235,7 +232,7 @@ end
 post '/user/:user_id/delete' do
   session[:message] = "#{@user.username} has been deleted"
 
-  @storage.delete_user!(@user)
+  @users.delete!(@user)
   @user = nil
 
   session.delete(:current_user)
@@ -251,10 +248,7 @@ end
 
 post '/kindness/new' do
   session[:message] = 'Your post has been created'
-  username = @user.username
-  description = params[:description]
-
-  @user.add_post!(description)
+  @user.add_post!(params[:description])
 
   case settings.last_route
   when '/'
@@ -268,10 +262,10 @@ get '/kindness/:post_id' do
   id = params[:post_id].to_i
 
   settings.last_route = "/kindness/#{id}"
-  @post = @storage.post(id)
-  @user_created_post = @user&.username == @post['posted_by']
+  @post = @posts.with_id(id)
+  @is_user_created_post = (@user&.username == @post.posted_by)
 
-  @first_comment = @post['comments'].shift.last if @post['comments'] && !signed_in?
+  @first_comment = @post.comments.shift.last if @post.comments && !signed_in?
 
   erb :post, layout: :layout
 end
@@ -287,8 +281,8 @@ end
 
 post '/kindness/:post_id/like' do
   post_id = params[:post_id].to_i
-
-  @user.toggle_like!(post_id)
+  post = @posts.with_id(post_id)
+  @user.toggle_like!(post)
 
   redirect "/kindness/#{post_id}"
 end
@@ -307,10 +301,11 @@ get '/query/:query_type&:query' do
   @query = params[:query]
 
   if @query_type == 'username'
-    user_ids = @storage.similar_user_ids_for(@query)
-    @users = user_ids.map { |user_id| User.new(user_id: user_id) }
+    user_ids = @users.ids_for_similar(@query)
+    @selected_users = user_ids.map { |user_id| User.new(user_id: user_id) }
   elsif @query_type == 'hashtag'
-    @posts = @storage.find_posts_for(@query)
+
+    @selected_posts = @posts.with_hashtag(@query)
   else
     session[:message] = 'Invalid input'
 

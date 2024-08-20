@@ -1,5 +1,5 @@
-require_relative 'metadata-processor'
 require_relative 'database-connection'
+require_relative 'metadata-processor'
 
 # User interface
 class User < DatabaseConnection
@@ -17,50 +17,14 @@ class User < DatabaseConnection
 
   attr_reader :profile, :id, :username, :name, :email
 
-  def public_profile
-    @profile.reject { |k, _| ['id', 'username'].include? k }
-  end
-
-  def update_profile!(old_name, old_email, new_name, new_email)
+  def add_comment!(post_id, comment)
     sql = <<~QUERY
-      UPDATE users
-         SET name = $1,
-             email = $2
-       WHERE name = $3 AND email = $4;
+      INSERT INTO comments
+                  (post_id, user_id, description)
+           VALUES ($1, $2, $3);
     QUERY
 
-    query(new_name, new_email, old_name, old_email, sql)
-    @profile = find_profile(@id)
-  end
-
-  def posts
-    sql = <<~QUERY
-      SELECT p.id AS post_id,
-             u.username AS posted_by,
-             u.id AS user_id,
-             p.description AS description,
-             l_user.username AS liked_by,
-             c.id AS comment_id,
-             c_user.id AS comment_user_id,
-             c_user.username AS commented_by,
-             c.description AS comment
-        FROM posts AS p
-        JOIN users AS u
-          ON u.id = p.user_id
-   LEFT JOIN likes AS l
-          ON p.id = l.post_id
-   LEFT JOIN users AS l_user
-          ON l.user_id = l_user.id
-   LEFT JOIN comments AS c
-          ON p.id = c.post_id
-   LEFT JOIN users AS c_user
-          ON c.user_id = c_user.id
-       WHERE u.username = $1
-    ORDER BY p.id;
-    QUERY
-
-    result = query(username, sql)
-    merge_metadata(result)
+    query(post_id, @id, comment, sql)
   end
 
   def add_post!(description)
@@ -72,7 +36,7 @@ class User < DatabaseConnection
 
     query(id, description, sql)
 
-    add_hashtags_in_last_post
+    Hashtags.new.record_from(last_post)
   end
 
   def delete_post!(post_id)
@@ -84,8 +48,13 @@ class User < DatabaseConnection
     query(post_id, sql)
   end
 
-  def toggle_like!(post_id)
-    like_state = post_liked?(post_id)
+  def public_profile
+    @profile.reject { |k, _| ['id', 'username'].include? k }
+    # username should be part of the public profile but not editable
+  end
+
+  def toggle_like!(post)
+    like_state = post.liked_by.include?(@username)
     like_sql = <<~QUERY
       INSERT INTO likes
                   (post_id, user_id)
@@ -97,83 +66,23 @@ class User < DatabaseConnection
     QUERY
 
     sql = (like_state ? unlike_sql : like_sql)
-    user_id = id
 
-    query(post_id, user_id, sql)
+    query(post.id, @id, sql)
   end
 
-  def add_comment!(post_id, comment)
+  def update_profile!(new_name, new_email)
     sql = <<~QUERY
-      INSERT INTO comments
-                  (post_id, user_id, description)
-           VALUES ($1, $2, $3);
+      UPDATE users
+         SET name = $1,
+             email = $2
+       WHERE name = $3 AND email = $4;
     QUERY
 
-    query(post_id, @id, comment, sql)
+    query(new_name, new_email, @name, @email, sql)
+    @profile = find_profile(@id)
   end
 
   private
-
-  def add_hashtags_in_last_post
-    hashtags = hashtags_in_last_post
-    return if hashtags.empty?
-
-    hashtag_list_sql = <<~QUERY
-      INSERT INTO hashtag_list (title)
-      VALUES ($1);
-    QUERY
-
-    hashtags_sql = <<~QUERY
-      INSERT INTO hashtags (post_id, hashtag_id)
-      VALUES ($1, $2);
-    QUERY
-
-    hashtags.each do |hashtag|
-      query(hashtag, hashtag_list_sql) unless hashtag_exists?(hashtag) # add hashtag to hashtag_list
-
-      h_id = hashtag_id(hashtag)
-      post_id = last_post['id']
-
-      query(post_id, h_id, hashtags_sql) # add hashtag to hashtags
-    end
-  end
-
-  def hashtag_exists?(hashtag)
-    sql = <<~QUERY
-      SELECT id FROM hashtag_list
-       WHERE title = $1;
-    QUERY
-
-    result = query(hashtag, sql)
-    result.values.flatten.any?
-  end
-
-  def hashtag_id(hashtag)
-    sql = <<~QUERY
-      SELECT id FROM hashtag_list
-       WHERE title = $1;
-    QUERY
-
-    result = query(hashtag, sql)
-
-    result.first['id']
-  end
-
-  def last_post
-    sql = <<~QUERY
-      SELECT * FROM posts
-      ORDER BY id DESC
-      LIMIT 1;
-    QUERY
-
-    result = query(sql)
-    result.first
-  end
-
-  def hashtags_in_last_post
-    post_description = last_post['description']
-    post_description.split.select { |string| string[0] == '#' }.map { |string| string[1..] }
-  end
 
   def find_profile(user_id)
     sql = <<~QUERY
@@ -191,34 +100,5 @@ class User < DatabaseConnection
     likes = public_posts[id]['liked_by']
 
     likes.include?(username) if likes
-  end
-
-  def all_posts
-    sql = <<~QUERY
-        SELECT p.id AS post_id,
-               u.username AS posted_by,
-               u.id AS user_id,
-               p.description AS description,
-               l_user.username AS liked_by,
-               c.id AS comment_id,
-               c_user.id AS comment_user_id,
-               c_user.username AS commented_by,
-               c.description AS comment
-          FROM posts AS p
-          JOIN users AS u
-            ON u.id = p.user_id
-     LEFT JOIN likes AS l
-            ON p.id = l.post_id
-     LEFT JOIN users AS l_user
-            ON l.user_id = l_user.id
-     LEFT JOIN comments AS c
-            ON p.id = c.post_id
-     LEFT JOIN users AS c_user
-            ON c.user_id = c_user.id
-      ORDER BY p.id;
-    QUERY
-
-    result = query(sql)
-    merge_metadata(result)
   end
 end
