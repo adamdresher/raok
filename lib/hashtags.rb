@@ -10,19 +10,6 @@ class Hashtags < DatabaseConnection
     result.values.flatten
   end
 
-  # last hashtag created
-  def last
-    sql = <<~QUERY
-      SELECT title
-        FROM hashtag_list
-    ORDER BY id
-       LIMIT 1;
-    QUERY
-
-    result = query(sql)
-    result.values.flatten
-  end
-
   def record_from(post)
     return if post.hashtags.empty?
 

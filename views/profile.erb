@@ -1,8 +1,8 @@
 <div>
   <h2><%== @user.username %></h2>
-  <% if @is_current_user_profile %>
+  <% if @is_profile_from_current_user %>
     <div>
-      <form action="/user/edit" method="get">
+      <form action="/user/<%== @user.id %>/edit" method="get">
         <button type="submit">Edit Profile</button>
       </form>
 

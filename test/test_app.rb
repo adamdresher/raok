@@ -42,6 +42,7 @@ class RAOKTest < Minitest::Test
 
   def setup
     @users = Users.new
+    @users.delete_all_data # ensures tests start with empty db
   end
 
   def teardown
@@ -80,7 +81,7 @@ class RAOKTest < Minitest::Test
     assert_equal 302, last_response.status
     get last_response["Location"]
 
-    assert_includes last_response.body, '<p>Password unaccepted, repeat the same password twice'
+    assert_includes last_response.body, '<p>Password must be repeated twice'
   end
 
   def test_signup_fail_invalid_password

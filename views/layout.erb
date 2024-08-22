@@ -46,9 +46,10 @@
       </div>
 
       <div id="message">
-        <% if session[:message] %>
-          <p><%= session.delete(:message) %></p>
+        <% while session[:message]&.any? do %>
+          <p><%== session[:message].shift %></p>
         <% end %>
+        <% session.delete(:message) %>
       </div>
     </header>
 

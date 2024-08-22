@@ -1,6 +1,5 @@
 require 'pg'
 
-# Connection to PostgreSQL database
 class DatabaseConnection
   def initialize(logger: nil)
     @logger = logger

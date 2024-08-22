@@ -1,7 +1,6 @@
 require_relative 'database-connection'
 require_relative 'metadata-processor'
 
-# User interface
 class User < DatabaseConnection
   include MetadataProcessor
 

@@ -40,7 +40,7 @@
 
         <td class="center">
           <p>
-            <%== list_likes_from(@post.liked_by, @user) %>
+            <%== list_likes_from(@post.liked_by, @user&.username) %>
           </p>
         </td>
       </tr>

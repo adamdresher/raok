@@ -6,7 +6,6 @@ require 'pry'
 require 'pry-byebug'
 
 require_relative 'lib/database-connection'
-require_relative 'lib/storage'
 require_relative 'lib/users'
 require_relative 'lib/user'
 require_relative 'lib/posts'
@@ -44,6 +43,22 @@ end
 
 # Route helper methods
 
+def check_signup_credentials(user_data)
+  signup_status = []
+  signup_status << 'Username is already taken, choose a new username' if @users.include?(username: user_data['username'])
+  signup_status << 'Email address is already registered' if @users.include?(email: user_data['email'])
+  signup_status << 'Username cannot contain spaces' unless valid_username?(user_data['username'])
+  signup_status << 'Invalid email address' unless valid_email?(user_data['email'])
+  signup_status << 'Password must be 6 or more characters, including uppercase and lowercase letters and a number' unless valid_password?(user_data['password1'])
+  signup_status << 'Password must be repeated twice' unless password_repeated?(user_data['password1'], user_data['password2'])
+
+  if signup_status.empty?
+   signup_status = :valid
+  end
+
+  signup_status
+end
+
 def format_likes_from(users, count)
   case count
   when 0   then 'No likes yet, be the first!'
@@ -54,26 +69,18 @@ def format_likes_from(users, count)
   end
 end
 
-def list_contains_user?(users, current_user)
-  users && current_user && users.include?(current_user.username)
+def list_contains_user?(usernames, current_username)
+  usernames&.include?(current_username)
 end
 
-def invalid_signup_message(user_data)
-  if user_data['password1'] != user_data['password2']
-    'Password unaccepted, repeat the same password twice'
-  elsif !user_data['password1'].match?(VALID_PASSWORD_PATTERN)
-    'Password must be 6 or more characters, including uppercase and lowercase letters and a number'
-  elsif @users.include?(username: user_data['username'])
-    'Username is already taken, choose a new username'
-  elsif @users.include?(email: user_data['email'])
-    'Email address is already registered'
-  end
+def password_repeated?(password1, password2)
+  password1 == password2
 end
 
 def redirect_home_if_signed_in
   return unless signed_in?
 
-  session[:message] = 'Please sign out first'
+  session[:message]  ['Please sign out first']
 
   redirect '/'
 end
@@ -81,9 +88,17 @@ end
 def redirect_home_unless_signed_in
   return if signed_in?
 
-  session[:message] = 'Please sign in first'
+  session[:message] = ['Please sign in first']
 
   redirect '/'
+end
+
+def reference_current_user_as_you(usernames, current_username)
+  if usernames&.include?(current_username)
+    usernames.prepend('you').delete(current_username)
+  end
+
+  usernames
 end
 
 def signed_in?
@@ -99,7 +114,7 @@ def user_profile(params)
   [name, email, username, password]
 end
 
-def valid_signin_credentials?(username, password)
+def valid_signin?(username, password)
   return false unless @users.include?(username: username)
 
   encrypted_password = @users.encrypted_password_for(username)
@@ -108,26 +123,28 @@ def valid_signin_credentials?(username, password)
   decrypted_password == password
 end
 
-def valid_signup_credentials?(user_data)
-  valid_password_input = user_data['password1'] == user_data['password2']
+def valid_email?(email)
+  email.match? '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'
+end
 
-  valid_password_input &&
-    user_data['password1'].match?(VALID_PASSWORD_PATTERN) &&
-    !@users.include?(username: user_data['username']) &&
-    !@users.include?(email: user_data['email'])
+def valid_password?(password)
+   password.match?(VALID_PASSWORD_PATTERN)
+end
+
+def valid_username?(username)
+  username.split.size == 1
 end
 
 helpers do
-  def list_likes_from(users, current_user)
-    users.prepend('you').delete(current_user) if list_contains_user?(users, current_user)
+  def list_likes_from(usernames, current_username)
+    usernames = reference_current_user_as_you(usernames, current_username)
+    count = usernames.size
 
-    count = users.class.instance_of?(Array) ? users.size : 0
-
-    format_likes_from(users, count)
+    format_likes_from(usernames, count)
   end
 
   def user_likes?(post)
-    post.liked_by && @user && post.liked_by.include?(@user.username)
+    signed_in? && post.liked_by.include?(@user.username)
   end
 end
 
@@ -147,14 +164,16 @@ get '/signup' do
 end
 
 post '/signup' do
-  if valid_signup_credentials?(params)
-    user_data = user_profile(params)
-    @users.add!(user_data)
-  
-    session[:message] = "Congrats #{params[:name]}, your account was created"
+  signup_credentials_status = check_signup_credentials(params)
+
+  if signup_credentials_status == :valid
+    session[:message] = ["Congrats #{params[:name]}, your account was created"]
+
+    @users.add!(user_profile(params))
+
     redirect '/'
   else
-    session[:message] = invalid_signup_message(params)
+    session[:message] = signup_credentials_status
   
     redirect '/signup'
   end
@@ -170,24 +189,22 @@ post '/signin' do
   username = params[:username]
   password = params[:password]
 
-  if valid_signin_credentials?(username, password)
+  if valid_signin?(username, password)
     user_id = @users.id_for(username)
     @user = User.new(user_id: user_id, logger: logger)
-
     session[:current_user] = user_id
-    session[:message] = "#{username} is signed in!"
+    session[:message] = ["#{username} is signed in!"]
 
     redirect '/'
   else
-    session[:message] = 'Invalid credentials'
+    session[:message] = ['Invalid credentials']
 
     redirect '/signin'
   end
 end
 
 post '/signout' do
-  session[:message] = "#{@user.username} is signed out"
-
+  session[:message] = ["#{@user.username} is signed out"]
   @user = nil
 
   session.delete(:current_user)
@@ -197,16 +214,14 @@ end
 
 get '/user/:user_id' do
   unless @users.exists?(user_id: params[:user_id])
-    session[:message] = 'User does not exist'
+    session[:message] = ['User does not exist']
 
     redirect '/'
   end
 
   @user = User.new(user_id: params[:user_id], logger: logger)
   @selected_posts = @posts.from_user(@user.id)
-
-  # current user has access to editing target user's profile
-  @is_current_user_profile = (session[:current_user] == @user.id)
+  @is_profile_from_current_user = (session[:current_user] == @user.id)
 
   settings.last_route = "/user/#{@user.id}"
 
@@ -220,7 +235,7 @@ get '/user/:user_id/edit' do
 end
 
 post '/user/:user_id/edit' do
-  session[:message] = "#{@user.username}'s profile has been updated"
+  session[:message] = ["#{@user.username}'s profile has been updated"]
   new_name = params[:name]
   new_email = params[:email]
 
@@ -230,12 +245,11 @@ post '/user/:user_id/edit' do
 end
 
 post '/user/:user_id/delete' do
-  session[:message] = "#{@user.username} has been deleted"
+  session[:message] = ["#{@user.username} has been deleted"]
+  session.delete(:current_user)
 
   @users.delete!(@user)
   @user = nil
-
-  session.delete(:current_user)
 
   redirect '/'
 end
@@ -247,41 +261,34 @@ get '/kindness/new' do
 end
 
 post '/kindness/new' do
-  session[:message] = 'Your post has been created'
+  session[:message] = ['Your post has been created']
   @user.add_post!(params[:description])
 
-  case settings.last_route
-  when '/'
-    redirect '/'
-  when "/user/#{@user.id}"
-    redirect "/user/#{@user.id}"
-  end
+  redirect settings.last_route
 end
 
 get '/kindness/:post_id' do
   id = params[:post_id].to_i
-
   settings.last_route = "/kindness/#{id}"
   @post = @posts.with_id(id)
   @is_user_created_post = (@user&.username == @post.posted_by)
-
-  @first_comment = @post.comments.shift.last if @post.comments && !signed_in?
 
   erb :post, layout: :layout
 end
 
 post '/kindness/:post_id/delete' do
-  session[:message] = 'Your post has been deleted'
+  session[:message] = ['Your post has been deleted']
   id = params[:post_id].to_i
 
   @user.delete_post!(id)
 
-  redirect '/'
+  redirect settings.last_route
 end
 
 post '/kindness/:post_id/like' do
   post_id = params[:post_id].to_i
   post = @posts.with_id(post_id)
+
   @user.toggle_like!(post)
 
   redirect "/kindness/#{post_id}"
@@ -304,10 +311,9 @@ get '/query/:query_type&:query' do
     user_ids = @users.ids_for_similar(@query)
     @selected_users = user_ids.map { |user_id| User.new(user_id: user_id) }
   elsif @query_type == 'hashtag'
-
     @selected_posts = @posts.with_hashtag(@query)
   else
-    session[:message] = 'Invalid input'
+    session[:message] = ['Invalid input']
 
     redirect '/'
   end
