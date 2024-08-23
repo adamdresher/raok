@@ -1,5 +1,6 @@
-require_relative 'database-connection'
+require_relative 'database_connection'
 
+# Handles the interface for hashtags
 class Hashtags < DatabaseConnection
   def all
     sql = <<~QUERY
@@ -54,7 +55,7 @@ class Hashtags < DatabaseConnection
       VALUES ($1, $2);
     QUERY
 
-    result = query(post_id, hashtag_id, sql)
+    query(post_id, hashtag_id, sql)
   end
 
   def create!(title)

@@ -1,6 +1,7 @@
 require_relative 'hashtags'
 require_relative 'post'
 
+# Structures Post data
 module MetadataProcessor
   private
 
@@ -8,17 +9,18 @@ module MetadataProcessor
     return unless data['comment']
 
     id = data['comment_id'].to_i
-    comment, comments = 'comment', 'comments'
-    new_comment = { comment => data[comment], 'commented_by' => data['commented_by'], 'user_id' => data['comment_user_id'] }
+    new_comment = { 'comment' => data['comment'],
+                    'commented_by' => data['commented_by'],
+                    'user_id' => data['comment_user_id'] }
 
-    if post[comments]
+    if post['comments']
       # adds a comment if comments already exists
-      unless post[comments].include? data['comment_id']
-        post[comments].merge!(id => new_comment)
+      unless post['comments'].include? data['comment_id']
+        post['comments'].merge!(id => new_comment)
       end
     else
       # starts a list of comments if it doesn't exist
-      post[comments] = { id => new_comment }
+      post['comments'] = { id => new_comment }
     end
 
     post
@@ -66,6 +68,7 @@ module MetadataProcessor
     { id => post }
   end
 
+  # rubocop:disable Metrics/MethodLength
   def last_post
     sql = <<~QUERY
         SELECT p.id,
@@ -103,8 +106,10 @@ module MetadataProcessor
 
     Post.new(post_data)
   end
+  # rubocop:enable Metrics/MethodLength
 
-  def merge_metadata(posts) # posts is a PG::Result object which has access to Enumerable methods
+  # posts is a PG::Result object which has access to Enumerable methods
+  def merge_metadata(posts)
     merged_posts = {}
 
     posts.each do |post|
@@ -120,4 +125,3 @@ module MetadataProcessor
     merged_posts
   end
 end
-

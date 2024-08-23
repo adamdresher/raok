@@ -5,7 +5,7 @@ require 'pg'
 require 'pry'
 require 'pry-byebug'
 
-require_relative 'lib/database-connection'
+require_relative 'lib/database_connection'
 require_relative 'lib/users'
 require_relative 'lib/user'
 require_relative 'lib/posts'
@@ -23,7 +23,7 @@ end
 
 configure(:development) do
   require 'sinatra/reloader'
-  also_reload 'lib/database-connection.rb'
+  also_reload 'lib/database_connection.rb'
   also_reload 'lib/storage.rb'
   also_reload 'lib/user.rb'
 end
@@ -43,18 +43,31 @@ end
 
 # Route helper methods
 
+MESSAGES =
+  { username_taken: 'Username is already taken, choose a new username',
+    email_taken: 'Email address is already registered',
+    invalid_username: 'Username cannot contain spaces',
+    invalid_email: 'Invalid email address',
+    invalid_password1: 'Password must be 6 or more characters, including uppercase and lowercase letters and a number',
+    invalid_password2: 'Password must be repeated twice',
+    signin_first: 'Please sign in first',
+    signout_first: 'Please sign out first',
+    invalid_credentials: 'Invalid credentials',
+    user_not_found: 'User does not exist',
+    post_created: 'Your post has been created',
+    post_deleted: 'Your post has been deleted',
+    invalid_input: 'Invalid input' }.freeze
+
 def check_signup_credentials(user_data)
   signup_status = []
-  signup_status << 'Username is already taken, choose a new username' if @users.include?(username: user_data['username'])
-  signup_status << 'Email address is already registered' if @users.include?(email: user_data['email'])
-  signup_status << 'Username cannot contain spaces' unless valid_username?(user_data['username'])
-  signup_status << 'Invalid email address' unless valid_email?(user_data['email'])
-  signup_status << 'Password must be 6 or more characters, including uppercase and lowercase letters and a number' unless valid_password?(user_data['password1'])
-  signup_status << 'Password must be repeated twice' unless password_repeated?(user_data['password1'], user_data['password2'])
+  signup_status << MESSAGES[:username_taken] if @users.include?(username: user_data['username'])
+  signup_status << MESSAGES[:email_taken] if @users.include?(email: user_data['email'])
+  signup_status << MESSAGES[:invalid_username] unless valid_username?(user_data['username'])
+  signup_status << MESSAGES[:invalid_email] unless valid_email?(user_data['email'])
+  signup_status << MESSAGES[:invalid_password1] unless valid_password?(user_data['password1'])
+  signup_status << MESSAGES[:invalid_password2] unless password_repeated?(user_data['password1'], user_data['password2'])
 
-  if signup_status.empty?
-   signup_status = :valid
-  end
+  signup_status = :valid if signup_status.empty?
 
   signup_status
 end
@@ -80,7 +93,7 @@ end
 def redirect_home_if_signed_in
   return unless signed_in?
 
-  session[:message]  ['Please sign out first']
+  session[:message] = [ERROR_MESSAGE[:signout_first]]
 
   redirect '/'
 end
@@ -88,15 +101,13 @@ end
 def redirect_home_unless_signed_in
   return if signed_in?
 
-  session[:message] = ['Please sign in first']
+  session[:message] = [ERROR_MESSAGE[:signin_first]]
 
   redirect '/'
 end
 
-def reference_current_user_as_you(usernames, current_username)
-  if usernames&.include?(current_username)
-    usernames.prepend('you').delete(current_username)
-  end
+def reference_current_user_as_you(usernames, username)
+  usernames.prepend('you').delete(username) if usernames&.include?(username)
 
   usernames
 end
@@ -128,7 +139,7 @@ def valid_email?(email)
 end
 
 def valid_password?(password)
-   password.match?(VALID_PASSWORD_PATTERN)
+  password.match?(VALID_PASSWORD_PATTERN)
 end
 
 def valid_username?(username)
@@ -174,7 +185,7 @@ post '/signup' do
     redirect '/'
   else
     session[:message] = signup_credentials_status
-  
+
     redirect '/signup'
   end
 end
@@ -197,7 +208,7 @@ post '/signin' do
 
     redirect '/'
   else
-    session[:message] = ['Invalid credentials']
+    session[:message] = [MESSAGES[:invalid_credentials]]
 
     redirect '/signin'
   end
@@ -214,7 +225,7 @@ end
 
 get '/user/:user_id' do
   unless @users.exists?(user_id: params[:user_id])
-    session[:message] = ['User does not exist']
+    session[:message] = [ERROR_MESSAGE[:user_not_found]]
 
     redirect '/'
   end
@@ -261,7 +272,7 @@ get '/kindness/new' do
 end
 
 post '/kindness/new' do
-  session[:message] = ['Your post has been created']
+  session[:message] = [MESSAGES[:post_created]]
   @user.add_post!(params[:description])
 
   redirect settings.last_route
@@ -270,6 +281,7 @@ end
 get '/kindness/:post_id' do
   id = params[:post_id].to_i
   settings.last_route = "/kindness/#{id}"
+
   @post = @posts.with_id(id)
   @is_user_created_post = (@user&.username == @post.posted_by)
 
@@ -277,7 +289,7 @@ get '/kindness/:post_id' do
 end
 
 post '/kindness/:post_id/delete' do
-  session[:message] = ['Your post has been deleted']
+  session[:message] = [MESSAGES[:post_deleted]]
   id = params[:post_id].to_i
 
   @user.delete_post!(id)
@@ -313,7 +325,7 @@ get '/query/:query_type&:query' do
   elsif @query_type == 'hashtag'
     @selected_posts = @posts.with_hashtag(@query)
   else
-    session[:message] = ['Invalid input']
+    session[:message] = [MESSAGES[:invalid_input]]
 
     redirect '/'
   end

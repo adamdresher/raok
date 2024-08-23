@@ -1,10 +1,12 @@
-require_relative 'database-connection'
-require_relative 'metadata-processor'
+require_relative 'database_connection'
+require_relative 'metadata_processor'
 require_relative 'post'
 
+# Interface for all posts
 class Posts < DatabaseConnection
   include MetadataProcessor
 
+  # rubocop:disable Metrics/MethodLength
   def all
     sql = <<~QUERY
         SELECT p.id,
@@ -39,7 +41,7 @@ class Posts < DatabaseConnection
     result = query(sql)
     posts_data = merge_metadata(result)
 
-    posts_data.map { |id, post_data| Post.new(post_data) }
+    posts_data.map { |_id, post_data| Post.new(post_data) }
   end
 
   def from_user(id)
@@ -77,7 +79,7 @@ class Posts < DatabaseConnection
     result = query(id, sql)
     posts_data = merge_metadata(result)
 
-    posts_data.map { |id, post_data| Post.new(post_data) }
+    posts_data.map { |_id, post_data| Post.new(post_data) }
   end
 
   def last_post
@@ -113,7 +115,7 @@ class Posts < DatabaseConnection
     QUERY
 
     result = query(sql)
-    posts_data = merge_metadata(result).first
+    post_data = merge_metadata(result).first
 
     Post.new(post_data)
   end
@@ -153,7 +155,7 @@ class Posts < DatabaseConnection
     result = query(title, sql)
     posts_data = merge_metadata(result)
 
-    posts_data.map { |id, post_data| Post.new(post_data) }
+    posts_data.map { |_id, post_data| Post.new(post_data) }
   end
 
   def with_id(id)
@@ -192,4 +194,5 @@ class Posts < DatabaseConnection
 
     Post.new(post_data)
   end
+  # rubocop:enable Metrics/MethodLength
 end

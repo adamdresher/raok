@@ -1,5 +1,6 @@
 require 'pg'
 
+# Connects to the database
 class DatabaseConnection
   def initialize(logger: nil)
     @logger = logger
@@ -17,14 +18,15 @@ class DatabaseConnection
   end
 
   def query(*params, sql)
-    @logger.info "#{sql}: #{params}" if @logger
+    @logger&.info "#{sql}: #{params}"
     @db.exec_params(sql, params)
   end
 
   def delete_all_data
     relations = ['users', 'hashtag_list']
-    sequences = ['users_id_seq', 'posts_id_seq', 'likes_id_seq', 'comments_id_seq',
-                 'favorites_id_seq', 'hashtags_id_seq', 'hashtag_list_id_seq']
+    sequences = ['users_id_seq', 'posts_id_seq', 'likes_id_seq',
+                 'comments_id_seq', 'favorites_id_seq',
+                 'hashtags_id_seq', 'hashtag_list_id_seq']
 
     relations.each do |relation|
       sql = "DELETE FROM #{relation};"

@@ -1,6 +1,7 @@
-require_relative 'database-connection'
-require_relative 'metadata-processor'
+require_relative 'database_connection'
+require_relative 'metadata_processor'
 
+# Interface for individual users
 class User < DatabaseConnection
   include MetadataProcessor
 
@@ -98,6 +99,6 @@ class User < DatabaseConnection
     public_posts = all_posts
     likes = public_posts[id]['liked_by']
 
-    likes.include?(username) if likes
+    likes&.include?(username)
   end
 end
