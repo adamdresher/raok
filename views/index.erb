@@ -10,8 +10,10 @@
   <% @public_posts.each do |post| %>
 
     <article class="post">
-      <div class="post content">
-        <p><%== post.description %></p>
+      <div class="description">
+        <div class="preview">
+          <p><%== post.description %></p>
+        </div>
       </div>
 
       <div class="post metadata">

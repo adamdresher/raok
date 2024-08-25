@@ -12,6 +12,10 @@ require_relative 'lib/posts'
 
 # must contain a lowercase letter, uppercase letter, and a number
 VALID_PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/
+# PREVIEW_LENGTH = 19
+# PREVIEW_HEIGHT = 4
+# POST_LENGTH = 110
+# POST_HEIGHT = 42
 
 configure do
   enable :sessions
@@ -146,6 +150,22 @@ def valid_username?(username)
   username.split.size == 1
 end
 
+# def add_dots(line)
+#   line = (line + (' ' * (PREVIEW_LENGTH - line.length)))
+#   line[-3..-1] = '...'
+#   line
+# end
+# 
+# def split_word(word, length)
+#   substrings = []
+# 
+#   until word.empty? do
+#     substrings << word.slice!(0, length - 1)
+#   end
+# 
+#   substrings
+# end
+
 helpers do
   def list_likes_from(usernames, current_username)
     usernames = reference_current_user_as_you(usernames, current_username)
@@ -154,11 +174,42 @@ helpers do
     format_likes_from(usernames, count)
   end
 
+#   def preview(description)
+#     preview = []
+#     line = ''
+#     words = description.split
+# 
+#     words.each_with_index do |word, idx|
+#       if idx == 0 && word.length <= PREVIEW_LENGTH # first word and fits in one line
+#         line << word
+#       elsif (line + word).length <= PREVIEW_LENGTH - 1 # word can be added on the same line
+#         line << word.prepend(' ')
+#       elsif word.length > PREVIEW_LENGTH # word is longer than a line
+#         preview << line.clone unless line.empty?
+# 
+#         substrings = split_word(word, PREVIEW_LENGTH)[..4]
+#         line << substrings.pop # ensures the last substring is added later
+# 
+#         substrings.each { |substring| preview << substring }
+#       else # line is full
+#         preview << line.clone
+#         line.clear << word
+#       end
+# 
+#       preview << line if idx == (words.size - 1) # adds line to preview if it has the last word
+#     end
+# 
+#     if preview.length > PREVIEW_HEIGHT
+#       preview[PREVIEW_HEIGHT] = add_dots(preview[PREVIEW_HEIGHT])
+#     end
+# 
+#     preview[..PREVIEW_HEIGHT].join(' ')
+#   end
+
   def user_likes?(post)
     signed_in? && post.liked_by.include?(@user.username)
   end
 end
-
 # Routes
 
 get '/' do

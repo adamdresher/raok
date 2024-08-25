@@ -54,14 +54,22 @@ article.post {
   text-align: center;
 }
 
-article.post .content {
+article.post .description {
   background-color: #A8E4CB;
   box-sizing: border-box;
   padding: 1rem;
   height: 10rem;
   width: 10rem;
   align-content: center;
-  overflow: hidden;;
+}
+
+/* clips description to fit container */
+article.post .description .preview {
+  word-break:break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* metadata container */
@@ -105,12 +113,20 @@ article.current.post {
 }
 
 /* current post content container */
-article.current.post .content {
+article.current.post .description {
   position: relative;
   justify-content: center;
   align-items: center;
   padding-bottom: 100%;
   width: 100%;
+}
+
+/* breaks up long words in description */
+article.current.post .description .split {
+  word-break:break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* current post metadata container */
