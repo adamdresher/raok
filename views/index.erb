@@ -1,46 +1,47 @@
-<div class="feed">
-  <article class="post new_post">
-    <p><b>+</b></p>
+<div id="feed">
+  <div class="feed">
+    <article class="new_post">
+      <p><b>+</b></p>
 
-    <a href="/kindness/new">
-      <span></span>
-    </a>
-  </article>
-
-  <% @public_posts.each do |post| %>
-
-    <article class="post">
-      <div class="description">
-        <div class="preview">
-          <p><%== post.description %></p>
-        </div>
-      </div>
-
-      <div class="post metadata">
-        <div class="line">
-          <p>Kindness by <%== post.posted_by %></p>
-        </div>
-
-        <div class="line">
-          <% if user_likes?(post) %>
-            <img src="/icons/like-on.png" width="12" height="12">
-          <% else %>
-            <img src="/icons/like-off.png" width="12" height="12">
-          <% end %>
-
-          <p><%== post.liked_by ? post.liked_by.count : 0 %></p>
-
-          <img src="/icons/comments.png" width="12" height="12">
-
-          <p><%== post.comments ? post.comments.count : 0 %></p>
-        </div>
-      </div>
-
-      <a href="/kindness/<%== post.id %>">
+      <a href="/kindness/new">
         <span></span>
       </a>
     </article>
 
-  <% end %>
+    <% @public_posts.each do |post| %>
 
+      <article class="post">
+        <div class="description">
+          <div class="preview">
+            <p><%== post.description %></p>
+          </div>
+        </div>
+
+        <div class="metadata">
+          <div>
+            <p>Kindness by <%== post.posted_by %></p>
+          </div>
+
+          <div>
+            <% if user_likes?(post) %>
+              <img src="/icons/like-on.png" width="12" height="12">
+            <% else %>
+              <img src="/icons/like-off.png" width="12" height="12">
+            <% end %>
+
+            <p><%== post.liked_by ? post.liked_by.count : 0 %></p>
+
+            <img src="/icons/comments.png" width="12" height="12">
+
+            <p><%== post.comments ? post.comments.count : 0 %></p>
+          </div>
+        </div>
+
+        <a href="/kindness/<%== post.id %>">
+          <span></span>
+        </a>
+      </article>
+
+    <% end %>
+  </div>
 </div>

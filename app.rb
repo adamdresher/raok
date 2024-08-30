@@ -12,10 +12,6 @@ require_relative 'lib/posts'
 
 # must contain a lowercase letter, uppercase letter, and a number
 VALID_PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/
-# PREVIEW_LENGTH = 19
-# PREVIEW_HEIGHT = 4
-# POST_LENGTH = 110
-# POST_HEIGHT = 42
 
 configure do
   enable :sessions

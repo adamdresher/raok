@@ -1,5 +1,6 @@
 body {
   background-color: teal;
+  aligh-content: center;
 }
 
 .header {
@@ -39,9 +40,21 @@ body {
   color: #555;
 }
 
+/* container for feed */
+#feed {
+  display: inline-grid;
+  justify-items: center;
+}
+
 .feed {
   display: inline-block;
   text-align: center;
+  width: 80%;
+}
+
+#profile {
+  text-align: left;
+  padding: 0 20px;
 }
 
 article.post {
@@ -72,7 +85,7 @@ article.post .description .preview {
   overflow: hidden;
 }
 
-/* metadata container */
+/* container for metadata */
 article.post .metadata {
   background-color: #84C7AB;
   box-sizing: border-box;
@@ -84,15 +97,24 @@ article.post .metadata {
 }
 
 /* metadata content */
-article.post .metadata .line {
+article.post .metadata div {
   display:flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0rem;
 }
 
-/* post dimensions scale relatively */
-article.post span {
+/* scale to fill post tile container */
+#profile span {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  left: 10%;
+  top: 0;
+}
+
+/* scale to fill post tile container */
+article span {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -100,7 +122,7 @@ article.post span {
   top: 0;
 }
 
-/* current post container */
+/* container for current post */
 div.current.post {
   display: flex;
   justify-content: center;
@@ -112,8 +134,8 @@ article.current.post {
   width: 60%;
 }
 
-/* current post content container */
-article.current.post .description {
+/* container for current post description */
+.current.post .description {
   position: relative;
   justify-content: center;
   align-items: center;
@@ -122,15 +144,15 @@ article.current.post .description {
 }
 
 /* breaks up long words in description */
-article.current.post .description .split {
+.current.post .description .split {
   word-break:break-word;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* current post metadata container */
-article.current.post .metadata {
+/* container for current post metadata */
+.current.post .metadata {
   position: relative;
   display: table;
   justify-content: start;
@@ -138,31 +160,31 @@ article.current.post .metadata {
   width: 100%;
 }
 
-/* current post metadata left */
-article.current.post .metadata .left {
+/* left side metadata */
+.current.post .metadata .left {
   align-items: right;
 }
-/* current post metadata center */
-article.current.post .metadata .center {
+/* center metadata */
+.current.post .metadata .center {
   padding: 0 1rem;
 }
 
-/* current post metadata right */
-article.current.post .metadata .right {
+/* right side metadata */
+.current.post .metadata .right {
   align-items: left;
 }
 
-/* current post comment field */
+/* comment field in current post */
 #comment-field {
   width: 100%;
 }
 
-/* current post comment lines */
+/* individual comments in current post */
 td p {
   margin: 0 auto 0.5rem auto;
 }
 
-article.post.new_post {
+article.new_post {
   background-color: #93DEBE;
   position: relative;
   display: inline-block;
